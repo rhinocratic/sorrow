@@ -1,12 +1,12 @@
 (ns sorrow.sethi
+  ; https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data
   (:require [clojure.string :as str]))
 
 (def possible-primes
-  "A list of integers starting with 2, 3 and followed by all integers of the form 6k+1.
+  "A list of integers starting with 2, 3 and followed by all integers of the form 6k±1.
    The list includes all primes, and may be used for a quick primality check."
   (concat [2 3]
-    (->> (iterate inc 5)
-      (take-nth 6)
+    (->> (iterate #(+ 6 %) 5)
       (mapcat #(vector % (+ 2 %))))))
 
 (defn prime?
