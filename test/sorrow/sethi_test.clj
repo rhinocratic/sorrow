@@ -10,5 +10,14 @@
 (deftest test-prime?
   (testing "Primality predicate"
     (is (= first-50-primes (->> (iterate inc 1)
-                             (filter prime?)
+                             (filter #'sorrow.sethi/prime?)
                              (take 50))))))
+
+(deftest test-gcd
+  (testing "Greatest common divisor"
+    (is (= [-9 47 2] (#'sorrow.sethi/gcd 240 46)))
+    (is (= [47 -9 2] (#'sorrow.sethi/gcd 46 240)))))
+
+; (deftest test-mod-inverse
+;   (testing "Modular inverse"
+;     (is (= [1 ] (map #'sorrow.sethi/mod-inverse (range 1 12))))))
