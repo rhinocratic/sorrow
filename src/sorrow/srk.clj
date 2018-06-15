@@ -91,13 +91,12 @@
   a0.x0 + a1.x1 + ... + an ≡ 0 (mod p)
   b0.x0 + b1.x1 + ... + bn ≡ 0 (mod p)"
   [p a b i]
-  (let [lcm-of-ith-terms (lcm (nth a i) (nth b i))
-        scale-fn (fn [v] (scalev p (/ lcm-of-ith-terms (nth v i)) v))
-        [sa sb] (map scale-fn [a b])
-        difference (minusv p sa sb)]
-    (concat
-      (subvec difference 0 i)
-      (subvec difference (inc i)))))
+  (let [[ai bi] (map #(nth % i) [a b])
+        [sa sb] (map #(/ (lcm ai bi) %) [ai bi])
+        diff (minusv p (scalev p sa a) (scalev p sb b))]
+    (-> []
+      (into (take i diff))
+      (into (drop (inc i) diff)))))
 
 (defn- solve-linear-congruence
   "Find a solution x of the congruence r.x + s ≡ 0 (mod p)"
@@ -107,9 +106,8 @@
 
 (defn- solve-simultaneous-congruences
   "Solve the following simultaneous congruences for x and y:
-  a0.x0 + a1.x1 + ... + an ≡ 0 (mod p)
-  b0.x0 + b1.x1 + ... + bn ≡ 0 (mod p)"
+   a0.x + a1.y + a2 ≡ 0 (mod p)
+   b0.x + b1.y + b2 ≡ 0 (mod p)"
   [p a b]
-  (let [vs (map #(eliminate-ith-term p a b %) (range (dec (count a))))
-        sols (mapv (partial solve-linear-congruence p) vs)]
-    sols))
+  (let [vs (map #(eliminate-ith-term p a b %) [0 1])]
+    (mapv (partial solve-linear-congruence p) vs)))
