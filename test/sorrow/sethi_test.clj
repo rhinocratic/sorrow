@@ -18,6 +18,20 @@
     (is (= [-9 47 2] (#'sorrow.sethi/gcd 240 46)))
     (is (= [47 -9 2] (#'sorrow.sethi/gcd 46 240)))))
 
-; (deftest test-mod-inverse
-;   (testing "Modular inverse"
-;     (is (= [1 ] (map #'sorrow.sethi/mod-inverse (range 1 12))))))
+(deftest test-mod-inverse
+  (testing "Modular inverse"
+    (is (= [1 6 4 3 9 2 8 7 5 10] (map #(#'sorrow.sethi/mod-inverse % 11) (range 1 11))))))
+
+(deftest test-code-length
+  (testing "Calculate the length of an encoded word for a given alphabet size and weight parameter"
+    (is (= 13 (#'sorrow.sethi/code-length 37 0)))))
+
+(deftest test-weight-parameters
+  (testing "Calculation of weight parameters (method 1)"
+    (is (= [11 0] (#'sorrow.sethi/weight-parameters 13 37)))))
+
+(deftest test-weight-sequences
+  (testing "Calculation of weight sequences (method 1)"
+    (is (= [[12 13 14 15 16 17 18 19 20 21 22 23 24]
+            [12 26 5 23 6 28 15 4 32 25 20 17 16]]
+           (#'sorrow.sethi/weight-sequences 13 37)))))
