@@ -58,5 +58,9 @@
 
 (deftest test-solve-linear-congruence
   (testing "Solve a linear congruence modulo p"
-    (is (= 35 (#'sorrow.srk/solve-linear-congruence 37 26 15)))
-    (is (= 12 (#'sorrow.srk/solve-linear-congruence 37 27 9)))))
+    (is (= 12 (#'sorrow.srk/solve-linear-congruence 37 [27 9])))
+    (is (= 35 (#'sorrow.srk/solve-linear-congruence 37 [26 15])))))
+
+(deftest test-solve-simultaneous-congruences
+  (testing "Solve simultaneuous congruences modulo p"
+    (is (= [12 35] (#'sorrow.srk/solve-simultaneous-congruences 37 [30 9 26] [20 34 2])))))
