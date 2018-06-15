@@ -1,4 +1,4 @@
-(ns sorrow.sethi
+(ns sorrow.srk
   ; https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]))

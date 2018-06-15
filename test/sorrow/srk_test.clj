@@ -1,6 +1,6 @@
-(ns sorrow.sethi_test
+(ns sorrow.srk_test
   (:require [clojure.test :refer :all]
-            [sorrow.sethi :refer :all]))
+            [sorrow.srk :refer :all]))
 
 (def first-50-primes
   [2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101
@@ -10,28 +10,28 @@
 (deftest test-prime?
   (testing "Primality predicate"
     (is (= first-50-primes (->> (iterate inc 1)
-                             (filter #'sorrow.sethi/prime?)
+                             (filter #'sorrow.srk/prime?)
                              (take 50))))))
 
 (deftest test-gcd
   (testing "Greatest common divisor"
-    (is (= [-9 47 2] (#'sorrow.sethi/gcd 240 46)))
-    (is (= [47 -9 2] (#'sorrow.sethi/gcd 46 240)))))
+    (is (= [-9 47 2] (#'sorrow.srk/gcd 240 46)))
+    (is (= [47 -9 2] (#'sorrow.srk/gcd 46 240)))))
 
 (deftest test-mod-inverse
   (testing "Modular inverse"
-    (is (= [1 6 4 3 9 2 8 7 5 10] (map #(#'sorrow.sethi/mod-inverse % 11) (range 1 11))))))
+    (is (= [1 6 4 3 9 2 8 7 5 10] (map #(#'sorrow.srk/mod-inverse % 11) (range 1 11))))))
 
 (deftest test-code-length
   (testing "Calculate the length of an encoded word for a given alphabet size and weight parameter"
-    (is (= 13 (#'sorrow.sethi/code-length 37 0)))))
+    (is (= 13 (#'sorrow.srk/code-length 37 0)))))
 
 (deftest test-weight-parameters
   (testing "Calculation of weight parameters (method 1)"
-    (is (= [11 0] (#'sorrow.sethi/weight-parameters 13 37)))))
+    (is (= [11 0] (#'sorrow.srk/weight-parameters 13 37)))))
 
 (deftest test-weight-sequences
   (testing "Calculation of weight sequences (method 1)"
     (is (= [[12 13 14 15 16 17 18 19 20 21 22 23 24]
             [12 26 5 23 6 28 15 4 32 25 20 17 16]]
-           (#'sorrow.sethi/weight-sequences 13 37)))))
+           (#'sorrow.srk/weight-sequences 13 37)))))
