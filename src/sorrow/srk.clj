@@ -179,7 +179,7 @@
       (let [ep1 (dec (mod (- (* s2 (inv s1)) wp2) p))
             ep2 (dec (/ (- ep1 wp1) 2))]
         (cond
-          (<= 0 ep1 (dec n) {:transcription ep1})
+          (<= 0 ep1 (dec n)) {:transcription ep1}
           (and (int? ep2) (<= 0 ep2 (- n 2))) {:transposition ep2}
           :else {:uncorrectable -1})))))
 
@@ -193,59 +193,25 @@
      (let [checksums (mapv #(weight-sum p nums %) [w w'])
            num-zeros (count (filter zero? checksums))
            category (condp = num-zeros
-                      0 :correctable
+                      2 :correct
                       1 :uncorrectable
-                      2 :correct)]
+                      0 :correctable)]
 
        (conj checksums category))))
 
-(defn error-classifier
-  "For the given alphabet and encoded word length n, returns a function that accepts
-   a sequence of integers of length n and returns a keyword "
+(defn decoder
+  "Returns a function that decodes words of encoded length n+2, returning words of
+   length n and correcting single character transcription errors or transpositions
+   of adjacent characters."
   [a n]
   (let [p (count a)
-        inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))
-        [w w'] (weight-sequences p n)
-        check (checksum-calculator p w w')]
-    (fn [nums]
-      (let [[s1 s2 category] (check nums)
-            e1 (dec (mod (- (* s2 (inverses s1)) b) p))
-            e2 (dec (/ (- err-pos1 a) 2))]
-        (cond
-          (< -1 e1 n) :transcription
-          (and (int? e2) (< -1 e2 n)) :transposition
-          :else :uncorrectable)))))
-
-(defn error-corrector
-  "Find the position and nature (transcription or transposition) of any correctable
-   errors found in a word of length n"
-  [a n]
-  (let [p (count a)
-        inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))
-        e1 (dec (mod (- (* s2 (inverses s1)) b) p))
-        e2 (dec (/ (- err-pos1 a) 2))]
+        [wp1 wp1] (weight-parameters p n)
+        [w w'] (weight-sequences p n)]
     (fn [word]
-      (let [e1 (dec (mod (- (* s2 (inverses s1)) b) p))
-            e2 (dec (/ (- err-pos1 a) 2))]
-        (cond
-          (transcription-error? e1 e2 n) []
-          (transposition-error? e1 e2 n) []
-          :else :uncorrectable)))))
-;
-; (defn decoder
-;   "Returns a function that accepts words of length n + 2 (formed from characters of the
-;    given alphabet a) and decodes them to words of length n.
-;    The function detects and corrects single-character errors or transpositions of two adjacent characters."
-;    [a n]
-;    {:pre [(valid-params? a n)]}
-;    (let [p (count a)
-;          [w w'] (weight-sequences p n)
-;          inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))
-;          err-type (fn [nums])]
-;      (fn [nums]
-;        (let [[s1 s2] (map #(weight-sum p nums %) [w w'])]))))
-
-
+      (-> word
+        ((chars->integers))
+        ((decode))
+        ((integers->chars))))))
 
 (def alphanumeric-upper-case
   "An alphabet containing Digits and upper case letters, plus '*' to make the cardinality prime"
