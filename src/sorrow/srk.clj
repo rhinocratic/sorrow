@@ -47,8 +47,8 @@
     (mod p)))
 
 (defn- code-length
-  "For alphabet size p (prime) and arbitrary b >= 0, find the length of an encoded
-   word (including check characters) for an encoding scheme (Method 1).
+  "For alphabet size p (prime) and arbitrary b (0 <= b < p), find the length of an encoded
+   word (including check characters) for an encoding scheme (Method 1 from the paper).
    This will be a maximum when b = 0."
   [p b]
   (int (Math/floor (/ (- (+ p 2) b) 3))))
@@ -102,7 +102,8 @@
       (into (drop (inc i) diff)))))
 
 (defn- linear-congruence-solver
-  "Returns a function that finds a solution x for congruences of the form r.x + s ≡ 0 (mod p)"
+  "Returns a function that accepts parameters r, s and finds a solution x for
+   the linear congruence r.x + s ≡ 0 (mod p)"
   [p]
   (let [inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))]
     (fn [[r s]]
@@ -110,7 +111,8 @@
         (mod (* t (inverses r)) p)))))
 
 (defn- simultaneous-congruence-solver
-  "Returns a function that solves the following simultaneous congruences for x and y:
+  "Returns a function that accepts vectors a, b and solves the following simultaneous
+   congruences for x and y:
    a0.x + a1.y + a2 ≡ 0 (mod p)
    b0.x + b1.y + b2 ≡ 0 (mod p),
    returning a vector [x y] of the solutions."
@@ -121,15 +123,14 @@
         (mapv solve vs)))))
 
 (defn- checksum-appender
-  "Returns a function that accepts a word (as a sequence of integers), and appends two check digits
+  "Returns a function that accepts a sequence of integers and appends two check digits
    calculated from the weight sequences w and w'"
   [p w w']
-  (let [solve (simultaneous-congruence-solver p)]  
-    (fn [word]
-      (let [a (conj (vec (take-last 2 w)) (weighted-sum p word w))
-            b (conj (vec (take-last 2 w')) (weighted-sum p word w'))
+  (let [solve (simultaneous-congruence-solver p)]
+    (fn [nums]
+      (let [[a b] (map #(conj (vec (take-last 2 %)) (weighted-sum p nums %)) [w w'])
             [x y] (solve a b)]
-        (conj word x y)))))
+        (conj nums x y)))))
 
 (defn- chars->integers
   "Returns a function that maps words formed from characters of the alphabet to
@@ -155,12 +156,95 @@
     (and (prime? p) (<= n (Math/floor (/ (+ 2 p) 3))))))
 
 (defn encoder
-  "Returns a function that encodes words of length n (formed from characters
+  "Returns a function that encodes words of unencoded length n (formed from characters
    of the given alphabet a) by appending 2 checksum characters."
   [a n]
   {:pre [(valid-params? a n)]}
   (let [p (count a)
-        inverses (map #(mod-inverse p %) (range p))]))
+        [w w'] (weight-sequences p n)]
+    (fn [word]
+      (-> word
+        ((chars->integers a))
+        ((checksum-appender p w w'))
+        ((integers->chars a))))))
+
+(defn error-position-finder
+  "Given an alphabet size p, encoded word length n and a map of inverses modulo p,
+   returns a function that accepts a pair of checksums for a word with errors and
+   returns the error position along with a category of :transcription, :transposition
+   or :uncorrectable depending upon the type of error."
+  [p n inv]
+  (let [[wp1 wp1] (weight-parameters p n)]
+    (fn [s1 s2]
+      (let [ep1 (dec (mod (- (* s2 (inv s1)) wp2) p))
+            ep2 (dec (/ (- ep1 wp1) 2))]
+        (cond
+          (<= 0 ep1 (dec n) {:transcription ep1})
+          (and (int? ep2) (<= 0 ep2 (- n 2))) {:transposition ep2}
+          :else {:uncorrectable -1})))))
+
+(defn checksum-calculator
+  "Returns a function that calculates the checksums modulo p of a given sequence of integers
+   using the weight sequences supplied.  The function returns a vector of the checksums
+   along with a category of :correctable :uncorrectable or :correct according to the
+   number of checksums (0, 1 or 2) that were zero."
+   [p w w']
+   (fn [nums]
+     (let [checksums (mapv #(weight-sum p nums %) [w w'])
+           num-zeros (count (filter zero? checksums))
+           category (condp = num-zeros
+                      0 :correctable
+                      1 :uncorrectable
+                      2 :correct)]
+
+       (conj checksums category))))
+
+(defn error-classifier
+  "For the given alphabet and encoded word length n, returns a function that accepts
+   a sequence of integers of length n and returns a keyword "
+  [a n]
+  (let [p (count a)
+        inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))
+        [w w'] (weight-sequences p n)
+        check (checksum-calculator p w w')]
+    (fn [nums]
+      (let [[s1 s2 category] (check nums)
+            e1 (dec (mod (- (* s2 (inverses s1)) b) p))
+            e2 (dec (/ (- err-pos1 a) 2))]
+        (cond
+          (< -1 e1 n) :transcription
+          (and (int? e2) (< -1 e2 n)) :transposition
+          :else :uncorrectable)))))
+
+(defn error-corrector
+  "Find the position and nature (transcription or transposition) of any correctable
+   errors found in a word of length n"
+  [a n]
+  (let [p (count a)
+        inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))
+        e1 (dec (mod (- (* s2 (inverses s1)) b) p))
+        e2 (dec (/ (- err-pos1 a) 2))]
+    (fn [word]
+      (let [e1 (dec (mod (- (* s2 (inverses s1)) b) p))
+            e2 (dec (/ (- err-pos1 a) 2))]
+        (cond
+          (transcription-error? e1 e2 n) []
+          (transposition-error? e1 e2 n) []
+          :else :uncorrectable)))))
+;
+; (defn decoder
+;   "Returns a function that accepts words of length n + 2 (formed from characters of the
+;    given alphabet a) and decodes them to words of length n.
+;    The function detects and corrects single-character errors or transpositions of two adjacent characters."
+;    [a n]
+;    {:pre [(valid-params? a n)]}
+;    (let [p (count a)
+;          [w w'] (weight-sequences p n)
+;          inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))
+;          err-type (fn [nums])]
+;      (fn [nums]
+;        (let [[s1 s2] (map #(weight-sum p nums %) [w w'])]))))
+
 
 
 (def alphanumeric-upper-case
