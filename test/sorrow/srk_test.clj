@@ -56,11 +56,22 @@
   (testing "Eliminate ith term from a pair of simultaneous congruences modulo p"
     (is (= [29 33 4] (#'sorrow.srk/eliminate-ith-term 37 [1 2 3 4] [5 6 7 8] 2)))))
 
-(deftest test-solve-linear-congruence
+(deftest test-linear-congruence-solver
   (testing "Solve a linear congruence modulo p"
-    (is (= 12 (#'sorrow.srk/solve-linear-congruence 37 [27 9])))
-    (is (= 35 (#'sorrow.srk/solve-linear-congruence 37 [26 15])))))
+    (let [solver (#'sorrow.srk/linear-congruence-solver 37)]
+      (is (= 12 (solver [27 9])))
+      (is (= 35 (solver [26 15]))))))
 
-(deftest test-solve-simultaneous-congruences
-  (testing "Solve simultaneuous congruences modulo p"
-    (is (= [12 35] (#'sorrow.srk/solve-simultaneous-congruences 37 [30 9 26] [20 34 2])))))
+(deftest test-simultaneous-congruence-solver
+  (testing "Solve simultaneous congruences modulo p"
+    (let [solver (#'sorrow.srk/simultaneous-congruence-solver 37)]
+      (is (= [35 12] (solver [30 9 26] [20 34 2]))))))
+
+(deftest test-checksum-appender
+  (testing "Append a checksum to a word"
+    (let [appender (#'sorrow.srk/checksum-appender 37 [4 16 27 34 25 26 30 9] [35 4 29 16 5 27 20 34])]
+      (is (= [4 17 9 28 12 5 35 12] (appender [4 17 9 28 12 5]))))))
+
+; (deftest test-encode-word
+;   (testing "Encode a word"
+;     (is (= "4H9SC5ZC" (#'sorrow.srk/encode-word "4H9SC5")))))

@@ -1,5 +1,7 @@
 (ns sorrow.srk
-  ; https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data
+  "Implements the error-correcting coding scheme for alphanumeric data described by
+   A.S. Sethi, V. Rajaraman and P.S. Kenjale in their paper:
+   https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data"
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]))
 
@@ -84,12 +86,13 @@
 (defn- minusv
   "Subract v2 from v1, reducing the entries modulo p"
   [p v1 v2]
-  (vec (map #(mod (- %1 %2) p) v1 v2)))
+  (mapv #(mod (- %1 %2) p) v1 v2))
 
 (defn- eliminate-ith-term
-  "Eliminate the ith term from the simultaneous congruences modulo p represented by a and b:
-  a0.x0 + a1.x1 + ... + an ≡ 0 (mod p)
-  b0.x0 + b1.x1 + ... + bn ≡ 0 (mod p)"
+  "Eliminate the ith term from the simultaneous congruences modulo p represented
+   by vectors a and b:
+   a0.x0 + a1.x1 + ... + an ≡ 0 (mod p)
+   b0.x0 + b1.x1 + ... + bn ≡ 0 (mod p)"
   [p a b i]
   (let [[ai bi] (map #(nth % i) [a b])
         [sa sb] (map #(/ (lcm ai bi) %) [ai bi])
@@ -98,16 +101,72 @@
       (into (take i diff))
       (into (drop (inc i) diff)))))
 
-(defn- solve-linear-congruence
-  "Find a solution x of the congruence r.x + s ≡ 0 (mod p)"
-  [p [r s]]
-  (let [t (mod (- p s) p)]
-    (mod (* t (mod-inverse p r)) p)))
+(defn- linear-congruence-solver
+  "Returns a function that finds a solution x for congruences of the form r.x + s ≡ 0 (mod p)"
+  [p]
+  (let [inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))]
+    (fn [[r s]]
+      (let [t (mod (- p s) p)]
+        (mod (* t (inverses r)) p)))))
 
-(defn- solve-simultaneous-congruences
-  "Solve the following simultaneous congruences for x and y:
+(defn- simultaneous-congruence-solver
+  "Returns a function that solves the following simultaneous congruences for x and y:
    a0.x + a1.y + a2 ≡ 0 (mod p)
-   b0.x + b1.y + b2 ≡ 0 (mod p)"
-  [p a b]
-  (let [vs (map #(eliminate-ith-term p a b %) [0 1])]
-    (mapv (partial solve-linear-congruence p) vs)))
+   b0.x + b1.y + b2 ≡ 0 (mod p),
+   returning a vector [x y] of the solutions."
+  [p]
+  (let [solve (linear-congruence-solver p)]
+    (fn [a b]
+      (let [vs (map #(eliminate-ith-term p a b %) [1 0])]
+        (mapv solve vs)))))
+
+(defn- checksum-appender
+  "Returns a function that accepts a word (as a sequence of integers), and appends two check digits
+   calculated from the weight sequences w and w'"
+  [p w w']
+  (let [solve (simultaneous-congruence-solver p)]  
+    (fn [word]
+      (let [a (conj (vec (take-last 2 w)) (weighted-sum p word w))
+            b (conj (vec (take-last 2 w')) (weighted-sum p word w'))
+            [x y] (solve a b)]
+        (conj word x y)))))
+
+(defn- chars->integers
+  "Returns a function that maps words formed from characters of the alphabet to
+   sequences of integers."
+  [alphabet]
+  (fn [word]
+    (let [m (zipmap alphabet (range))]
+      (mapv m word))))
+
+(defn- integers->chars
+  "Returns a function that maps sequences of integers to words formed from characters
+   of the alphabet"
+  [alphabet]
+  (fn [nums]
+    (let [m (zipmap (range) alphabet)]
+      (apply str (map m nums)))))
+
+(defn- valid-params?
+  "Determine whether or not the cardinality of the alphabet a is prime, and the
+   desired word length n is within the bounds imposed by the alphabet size"
+  [a n]
+  (let [p (count a)]
+    (and (prime? p) (<= n (Math/floor (/ (+ 2 p) 3))))))
+
+(defn encoder
+  "Returns a function that encodes words of length n (formed from characters
+   of the given alphabet a) by appending 2 checksum characters."
+  [a n]
+  {:pre [(valid-params? a n)]}
+  (let [p (count a)
+        inverses (map #(mod-inverse p %) (range p))]))
+
+
+(def alphanumeric-upper-case
+  "An alphabet containing Digits and upper case letters, plus '*' to make the cardinality prime"
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*")
+
+(def alphanumeric-mixed-case
+  "An alphabet containing Digits, upper and lower case letters, minus capital 'O' to make the cardinality prime"
+  "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
