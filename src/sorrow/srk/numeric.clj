@@ -41,6 +41,13 @@
     (first)
     (mod p)))
 
+(defn weighted-sum
+  "Given a sequence of integers is and a sequence of weights ws,
+   return the weighted sum of the integers modulo p."
+  [p is ws]
+  (let [dot-product (apply + (map * is ws))]
+    (mod dot-product p)))
+
 (defn scalev
   "Multiply a vector v by the given scale s and reduce the entries modulo p"
   [p s v]

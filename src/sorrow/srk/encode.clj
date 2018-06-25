@@ -4,39 +4,8 @@
    https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data"
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]
-            [sorrow.srk.numeric :as n]))
-
-(defn code-length
-  "For alphabet size p (prime) and arbitrary b (0 <= b < p), find the length of an encoded
-   word (including check characters) for an encoding scheme (Method 1 from the paper).
-   This will be a maximum when b = 0."
-  [p b]
-  (int (Math/floor (/ (- (+ p 2) b) 3))))
-
-(defn weight-parameters
-  "For a desired encoded word length n and alphabet size p (prime), calculate the
-   two weight parameters a, b that will be used in generating weight sequences for
-   encoding and decoding.  Returns a vector [a b]"
-  [p n]
-  [(- n 2) (first (filter #(= n (code-length p %)) (range p)))])
-
-(defn weight-sequences
-  "For a desired encoded word length n and alphabet size p (prime), calculate the
-   two sequences of weights that will be used in encoding and decoding.  Returns a
-   vector of the weight sequences"
-  [p n]
-  (let [[a b] (weight-parameters p n)
-        r (range 1 (inc n))
-        w (partial + a)
-        w' (fn [x] (mod (* (+ a x) (+ b x)) p))]
-    [(mapv w r) (mapv w' r)]))
-
-(defn weighted-sum
-  "Given a sequence of integers is and a sequence of weights ws,
-   return the weighted sum of the integers modulo p."
-  [p is ws]
-  (let [dot-product (apply + (map * is ws))]
-    (mod dot-product p)))
+            [sorrow.srk.numeric :as n]
+            [sorrow.srk.weights.method1 :as w]))
 
 (defn checksum-appender
   "Returns a function that accepts a sequence of integers and appends two check digits
@@ -44,7 +13,7 @@
   [p w w']
   (let [solve (n/simultaneous-congruence-solver p)]
     (fn [nums]
-      (let [[a b] (map #(conj (vec (take-last 2 %)) (weighted-sum p nums %)) [w w'])
+      (let [[a b] (map #(conj (vec (take-last 2 %)) (n/weighted-sum p nums %)) [w w'])
             [x y] (solve a b)]
         (conj nums x y)))))
 
@@ -78,7 +47,7 @@
    :a, :b - parameters used in deriving the weight sequences used for encoding/decoding
    :w, :w' - weight sequences used in encoding/decoding"
   [alphabet n]
-  (let [[a b] (weight-parameters)]))
+  (let [[a b] (w/weight-parameters)]))
 
 (defn encoder
   "Returns a function that encodes words of unencoded length n (formed from characters
@@ -86,7 +55,7 @@
   [a n]
   {:pre [(valid-params? a n)]}
   (let [p (count a)
-        [w w'] (weight-sequences p n)]
+        [w w'] (w/weight-sequences p n)]
     (fn [word]
       (-> word
         ((chars->integers a))
@@ -99,7 +68,7 @@
    returns the error position along with a category of :transcription, :transposition
    or :uncorrectable depending upon the type of error."
   [p n inv]
-  (let [[wp1 wp2] (weight-parameters p n)]
+  (let [[wp1 wp2] (w/weight-parameters p n)]
     (fn [s1 s2]
       (let [ep1 (dec (mod (- (* s2 (inv s1)) wp2) p))
             ep2 (dec (/ (- ep1 wp1) 2))]
@@ -115,7 +84,7 @@
    number of checksums (0, 1 or 2) that were zero."
    [p w w']
    (fn [nums]
-     (let [checksums (mapv #(weighted-sum p nums %) [w w'])
+     (let [checksums (mapv #(n/weighted-sum p nums %) [w w'])
            num-zeros (count (filter zero? checksums))
            category (condp = num-zeros
                       2 :correct
@@ -130,8 +99,8 @@
 ;    of adjacent characters."
 ;   [a n]
 ;   (let [p (count a)
-;         [wp1 wp1] (weight-parameters p n)
-;         [w w'] (weight-sequences p n)]
+;         [wp1 wp1] (w/weight-parameters p n)
+;         [w w'] (w/weight-sequences p n)]
 ;     (fn [word]
 ;       (-> word
 ;         ((chars->integers))

@@ -1,4 +1,4 @@
-(ns sorrow.srk.numeric_test
+(ns sorrow.srk.numeric-test
   (:require [clojure.test :refer :all]
             [sorrow.srk.numeric :refer :all]))
 
@@ -25,6 +25,10 @@
 (deftest test-mod-inverse
   (testing "Modular inverse"
     (is (= [1 6 4 3 9 2 8 7 5 10] (map #(mod-inverse 11 %) (range 1 11))))))
+
+(deftest test-weighted-sum
+  (testing "Weighted sum of a sequence of integers modulo p"
+    (is (= 17 (weighted-sum 37 [1 2 3 4 5 6] [1 2 3 4 5 6])))))
 
 (deftest test-scalev
   (testing "Scale a vector, reducing entries modulo p"
