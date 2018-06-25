@@ -7,16 +7,6 @@
             [sorrow.srk.numeric :as n]
             [sorrow.srk.weights.method1 :as w]))
 
-(defn checksum-appender
-  "Returns a function that accepts a sequence of integers and appends two check digits
-   calculated from the weight sequences w and w'"
-  [p w w']
-  (let [solve (n/simultaneous-congruence-solver p)]
-    (fn [nums]
-      (let [[a b] (map #(conj (vec (take-last 2 %)) (n/weighted-sum p nums %)) [w w'])
-            [x y] (solve a b)]
-        (conj nums x y)))))
-
 (defn chars->integers
   "Returns a function that maps words formed from characters of the alphabet to
    sequences of integers."
@@ -59,7 +49,7 @@
     (fn [word]
       (-> word
         ((chars->integers a))
-        ((checksum-appender p w w'))
+        ((n/checksum-appender p w w'))
         ((integers->chars a))))))
 
 (defn error-position-finder

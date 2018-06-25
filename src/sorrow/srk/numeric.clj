@@ -91,3 +91,13 @@
     (fn [a b]
       (let [vs (map #(eliminate-ith-term p a b %) [1 0])]
         (mapv solve vs)))))
+
+(defn checksum-appender
+  "Returns a function that accepts a sequence of integers and appends two check digits
+   calculated from the weight sequences w and w'"
+  [p w w']
+  (let [solve (simultaneous-congruence-solver p)]
+    (fn [nums]
+      (let [[a b] (map #(conj (vec (take-last 2 %)) (weighted-sum p nums %)) [w w'])
+            [x y] (solve a b)]
+        (conj nums x y)))))
