@@ -8,10 +8,10 @@
    returns the error position along with a category of :transcription, :transposition
    or :uncorrectable depending upon the type of error."
   [p n inv]
-  (let [[wp1 wp2] (w/weight-parameters p n)]
+  (let [{:keys [a b]} (w/weight-scheme p n)]
     (fn [s1 s2]
-      (let [ep1 (dec (mod (- (* s2 (inv s1)) wp2) p))
-            ep2 (dec (/ (- ep1 wp1) 2))]
+      (let [ep1 (dec (mod (- (* s2 (inv s1)) b) p))
+            ep2 (dec (/ (- ep1 a) 2))]
         (cond
           (<= 0 ep1 (dec n)) {:transcription ep1}
           (and (int? ep2) (<= 0 ep2 (- n 2))) {:transposition ep2}
