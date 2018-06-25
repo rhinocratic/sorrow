@@ -1,4 +1,4 @@
-(ns sorrow.srk.decode
+(ns sorrow.srk.correction.method1
   (:require [sorrow.srk.numeric :as n]
             [sorrow.srk.weights.method1 :as w]))
 
@@ -32,18 +32,3 @@
                       0 :correctable)]
 
        (conj checksums category))))
-
-
-; (defn decoder
-;   "Returns a function that decodes words of encoded length n+2, returning words of
-;    length n and correcting single character transcription errors or transpositions
-;    of adjacent characters."
-;   [a n]
-;   (let [p (count a)
-;         [wp1 wp1] (w/weight-parameters p n)
-;         [w w'] (w/weight-sequences p n)]
-;     (fn [word]
-;       (-> word
-;         ((chars->integers))
-;         ((decode))
-;         ((integers->chars))))))

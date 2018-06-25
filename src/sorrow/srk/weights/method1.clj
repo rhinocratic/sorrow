@@ -1,4 +1,8 @@
-(ns sorrow.srk.weights.method1)
+(ns sorrow.srk.weights.method1
+  "Implementation of the first (simpler) method described in the paper for
+   generating weight sequences.  This will suffice if the desired length of
+   an encoded word is not more than ⌊(p + 2)/3⌋ where p (prime) is the cardinality
+   of the alphabet")
 
 (defn code-length
   "For alphabet size p (prime) and arbitrary b (0 <= b < p), find the length of an encoded
@@ -24,3 +28,10 @@
         w (partial + a)
         w' (fn [x] (mod (* (+ a x) (+ b x)) p))]
     [(mapv w r) (mapv w' r)]))
+
+; (defn valid-params?
+;   "Determine whether or not the cardinality of the alphabet a is prime, and the
+;    desired word length n is within the bounds imposed by the alphabet size"
+;   [a n]
+;   (let [p (count a)]
+;     (and (n/prime? p) (<= n (Math/floor (/ (+ 2 p) 3))))))
