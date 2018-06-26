@@ -53,8 +53,3 @@
   (testing "Solve simultaneous congruences modulo p"
     (let [solver (simultaneous-congruence-solver 37)]
       (is (= [35 12] (solver [30 9 26] [20 34 2]))))))
-
-(deftest test-checksum-appender
-  (testing "Append a two-number checksum to a sequence of positive numbers"
-    (let [appender (checksum-appender 37 [4 16 27 34 25 26 30 9] [35 4 29 16 5 27 20 34])]
-      (is (= [4 17 9 28 12 5 35 12] (appender [4 17 9 28 12 5]))))))

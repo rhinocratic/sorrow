@@ -2,7 +2,8 @@
   "Implements the error-correcting coding scheme for alphanumeric data described by
    A.S. Sethi, V. Rajaraman and P.S. Kenjale in their paper:
    https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data"
-   (:require [sorrow.srk.numeric :as n]
+   (:require [clojure.spec.alpha :as s]
+             [sorrow.srk.numeric :as n]
              [sorrow.srk.weights.method1 :as wm1]
              [sorrow.srk.weights.method2 :as wm2]))
 
@@ -14,15 +15,21 @@
   "An alphabet containing digits, upper and lower case letters, minus capital 'O' to make the cardinality prime"
   "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
-(defn alphabet?
-  "Predicate that returns true if its argument is a string of prime length with distinct characters."
-  [a]
-  (and
-    (string? a)
-    (apply distinct? a)
-    (n/prime? (count a))))
+; An alphabet is valid if its argument is a string of prime length with distinct characters.
+(s/def ::alphabet
+  (s/and
+    string?
+    #(apply distinct? %)
+    #(n/prime? (count %))))
 
-(defn str->ints
+; A scheme is valid if it consists of a valid alphabet and an (encoded) word length
+; that is achievable given the alphabet size.
+(s/def ::scheme
+  (s/and
+    #(int? (last %))
+    #(<= 5 (last %) (/ (dec (first %)) 2))))
+
+(defn- str->ints
   "Returns a function that converts words formed from characters of the alphabet a to
    sequences of integers."
   [a]
@@ -30,7 +37,7 @@
     (let [m (zipmap a (range))]
       (mapv m word))))
 
-(defn ints->str
+(defn- ints->str
   "Returns a function that converts sequences of integers to words formed from characters
    of the given alphabet a"
   [a]
@@ -38,24 +45,42 @@
     (let [m (zipmap (range) a)]
       (apply str (map m nums)))))
 
-(defn choose-method
+(defn- weight-scheme
   "Choose the method of calculating a weight scheme for encoding/correcting words,
-   based upon the alphabet size and desired (encoded) word length.  Where possible,
+   based upon size of alphabet a and desired (encoded) word length n.  Where possible,
    the simpler method 1 will be preferred, only using method 2 when longer words
    are required."
-  [p n]
-  (let [method1-max (int (Math/floor (/ (+ p 2) 3)))
-        method2-max (/ (dec p) 2)]
+  [a n]
+  (let [p (count a)
+        method1-max (int (Math/floor (/ (+ p 2) 3)))]
     (cond
-      (<= 4 n method1-max) :method1
-      (<= 5 n method2-max) :method2
-      :default :error)))
+      (<= n method1-max) (wm1/weight-scheme p n)
+      :else (wm2/weight-scheme p n))))
 
-; (defmulti weight-scheme choose-scheme)
-; (defmethod weight-scheme :method1 wm1/weight-scheme)
-; (defmethod weight-scheme :method2 wm2/weight-scheme)
-; (defmethod weight-scheme :error (fn [p n] {:error "Unable to find encoding scheme for requested alphabet and word length"}))
+(defn- checksum-appender
+  "Returns a function that accepts a sequence of integers and appends two check digits
+   calculated from the weight sequences w and w'"
+  [p w w']
+  (let [solve (n/simultaneous-congruence-solver p)]
+    (fn [nums]
+      (let [[a b] (map #(conj (vec (take-last 2 %)) (n/weighted-sum p nums %)) [w w'])
+            [x y] (solve a b)]
+        (conj nums x y)))))
+
+(defn- encoder-for-weight-scheme
+  "Returns an encoder for the given alphabet, encoded word length and weight scheme."
+  [a n {:keys [w w']}]
+  (let [appender (checksum-appender (count a) w w')]
+    (fn [w]
+      {:pre [(every? (set a) w) (= (- n 2) (count w))]}
+      (-> w
+        ((str->ints a))
+        appender
+        ((ints->str a))))))
 
 (defn encoder
   "Returns an encoder for words of encoded length n formed from letters of the alphabet a."
-  [a n])
+  [a n]
+  {:pre [(s/valid? ::alphabet a) (s/valid? ::scheme [(count a) n])]}
+  (let [ws (weight-scheme a n)]
+    (encoder-for-weight-scheme a n ws)))
