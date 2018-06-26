@@ -2,10 +2,6 @@
   (:require [clojure.test :refer :all]
             [sorrow.srk.weights.method1 :refer :all]))
 
-(deftest test-code-length
-  (testing "Calculate the length of an encoded word for a given alphabet size and weight parameter"
-    (is (= 13 (#'sorrow.srk.weights.method1/code-length 37 0)))))
-
 (deftest test-weight-scheme
   (testing "Calculation of weight scheme"
     (is (= {:a 11
