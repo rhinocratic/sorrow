@@ -1,14 +1,16 @@
 # sorrow
 
-A Clojure library designed to ... well, that part is up to you.
+Error-correcting codes for character data.
 
 ## Usage
 
-FIXME
+For Leiningen, add the following to the ```dependencies``` section of your project.clj:
+```
+[sorrow "0.1.0"]
+```
 
 ## License
 
-Copyright © 2018 FIXME
+Copyright © 2018
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License version 1.0.
