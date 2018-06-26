@@ -6,12 +6,6 @@
   (testing "Calculate the length of an encoded word for a given alphabet size and weight parameter"
     (is (= 13 (#'sorrow.srk.weights.method1/code-length 37 0)))))
 
-(deftest test-weight-parameters
-  (testing "Calculation of weight parameters"
-    (is (= {:a 11
-            :b 0}
-          (#'sorrow.srk.weights.method1/weight-parameters 37 13)))))
-
 (deftest test-weight-scheme
   (testing "Calculation of weight scheme"
     (is (= {:a 11

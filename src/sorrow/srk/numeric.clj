@@ -24,7 +24,8 @@
          y [1 0]
          r [n m]]
     (if (zero? (fnext r))
-      (vec (map first [x y r]))
+      (let [sgn (if (pos? (first r)) 1 -1)]
+        (vec (map #(* sgn (first %)) [x y r])))
       (let [nxt (fn [[a b]] [b (- a (* (quot (first r) (last r)) b))])
             [x' y' r'] (map nxt [x y r])]
         (recur x' y' r')))))

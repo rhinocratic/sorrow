@@ -16,7 +16,8 @@
 (deftest test-gcd
   (testing "Greatest common divisor"
     (is (= [-9 47 2] (gcd 240 46)))
-    (is (= [47 -9 2] (gcd 46 240)))))
+    (is (= [47 -9 2] (gcd 46 240)))
+    (is (= [-8 -17 1] (gcd 36 -17)))))
 
 (deftest test-lcm
   (testing "Least common multiple"
