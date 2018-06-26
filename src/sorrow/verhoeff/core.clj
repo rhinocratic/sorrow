@@ -60,6 +60,6 @@
 (defn valid?
   "Determine whether or not the supplied string is of length len and represents a number with a valid Verhoeff checksum."
   [len s]
-  {:pre [(and (int? len) (< 0 len) (string? s) (re-matches #"\d+" s))]}
+  {:pre [(int? len) (< 0 len) (string? s) (re-matches #"\d+" s)]}
   (and (= len (count s))
     (zero? (checksum (digits s len)))))
