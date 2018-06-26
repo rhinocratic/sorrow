@@ -52,7 +52,7 @@
 (defn encode
   "Encode a number according to the Verhoeff scheme, padding with leading zeroes to l-1 digits and appending a checksum."
   [len n]
-  {:pre [(and (int? n) (int? len) (< 0 n) (< 0 len) (> len (count (str n))))]}
+  {:pre [(int? n) (int? len) (< 0 n) (< 0 len) (> len (count (str n)))]}
   (let [digits (digits n (dec len))
         check-digit (inv (checksum (conj digits 0)))]
     (apply str (conj digits check-digit))))
