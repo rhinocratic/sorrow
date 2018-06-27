@@ -1,4 +1,4 @@
-(ns sorrow.correction.method1
+(ns sorrow.detection.method1
   (:require [sorrow.numeric :as n]
             [sorrow.weights.method1 :as w]))
 
@@ -22,7 +22,15 @@
     :else :uncorrectable))
 
 (defn error-corrector
-  [p n])
+  "Returns an error corrector function for the given weight scheme, accepting
+   integer vectors of length n and returning a map containing:
+   - :corrected - the corrected word (omitted if uncorrectable)
+   - :uncorrected - the uncorrected word
+   - :error-type - :transcription, :transposition or :uncorrectable
+   - :error-position - the position at which the error occurs (omitted if uncorrectable)"
+  [ws]
+  (let [pos (error-position-finder ws)]
+    (fn [])))
 
 (defn error-position-finder
   "Given an alphabet size p, encoded word length n and a map of inverses modulo p,
