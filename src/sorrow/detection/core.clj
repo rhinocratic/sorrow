@@ -2,9 +2,9 @@
    (:require [sorrow.numeric :as n]))
 
 (defn- checksum-calculator
-  "Returns a function that accepts a vector of integers of length n and returns
-   a vector of two checksums calculated from the given weight sequences w, w'."
-  [p {:keys [w w']}]
+  "Returns a function that accepts a vector of integers and returns a vector of
+   two checksums calculated from the given weight scheme."
+  [{:keys [p w w']}]
   (fn [nums]
     (mapv #(n/weighted-sum p nums %) [w w'])))
 

@@ -1,6 +1,7 @@
 (ns sorrow.weights.method2-test
   (:require [clojure.test :refer :all]
-            [sorrow.weights.method2 :refer :all]))
+            [sorrow.weights.method2 :refer :all]
+            [sorrow.core :refer [alphanumeric-upper-case]]))
 
 (deftest test-diff-coprime?
   (testing "Predicate to determine if x is coprime to b - a"
@@ -56,19 +57,21 @@
 
 (deftest test-weight-scheme
   (testing "Creation of weight scheme"
-    (is (= {:method 2
-            :p 37
+    (is (= {:p 37
             :n 18
             :a 2
             :b 19
             :w [4 16 27 34 25 26 30 9 36 33 21 10 3 12 11 7 28 1]
-            :w' [35 4 29 16 5 27 20 34 6 25 24 26 22 30 14 9 19 36]}
-          (weight-scheme 37 18)))
-    (is (= {:method 2
-            :p 37
+            :w' [35 4 29 16 5 27 20 34 6 25 24 26 22 30 14 9 19 36]
+            :alphabet alphanumeric-upper-case
+            :method 2}
+          (weight-scheme alphanumeric-upper-case 18)))
+    (is (= {:p 37
             :n 8
             :a 2
             :b 19
             :w [4 16 27 34 25 26 30 9]
-            :w' [35 4 29 16 5 27 20 34]}
-          (weight-scheme 37 8)))))
+            :w' [35 4 29 16 5 27 20 34]
+            :alphabet alphanumeric-upper-case
+            :method 2}
+          (weight-scheme alphanumeric-upper-case 8)))))

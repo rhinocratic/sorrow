@@ -86,7 +86,8 @@
    weight parameters and sequences that will be used in encoding and correcting.
    Returns a map of the weight parameters :a and :b, the weight sequences :w and :w,'
    the alphabet size and word length :p and :n, and the :method (= 2)"
-  [p n]
-  (let [[a b] (weight-parameters p)
+  [alpha n]
+  (let [p (count alpha)
+        [a b] (weight-parameters p)
         [w w'] (weight-sequences p n [a b])]
-    {:p p :n n :a a :b b :w w :w' w' :method 2}))
+    {:p p :n n :a a :b b :w w :w' w' :alphabet alpha :method 2}))
