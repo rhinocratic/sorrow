@@ -1,6 +1,5 @@
 (ns sorrow.encoding
   (:require [sorrow.translation :as t]
-            [sorrow.weights.core :as w]
             [sorrow.numeric :as n]))
 
 (defn- checksum-appender
