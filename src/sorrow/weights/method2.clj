@@ -24,8 +24,9 @@
     (into {})))
 
 (defn- distinct-pairs
-  "Find distinct pairs of unequal elements from a collection coll of distinct items.
-   The elements of each pair will retain the same order they had in the original collection."
+  "Find all distinct pairs (when considered as sets) of unequal elements from a
+  collection coll of distinct items.  The elements of each pair will retain the
+  same order they had in the original collection."
   [coll]
   (loop [c coll res []]
     (if (= 1 (count c))
@@ -35,7 +36,7 @@
 
 (defn- solution-predicate
   "For prime p, returns a predicate that accepts a vector of integers [a b] and is true when
-   2^a + 2^b ≡ 2 (mod p) or β^a - β^b ≡ 2 (mod p) where β = 2^((p - 3) / 2) with a even, b odd."
+  2^a + 2^b ≡ 2 (mod p) or β^a - β^b ≡ 2 (mod p) where β = 2^((p - 3) / 2) with a even, b odd."
   [p]
   (let [alphas (powers-of-n p 2)
         beta (apply * (repeat (/ (- p 3) 2) 2))
@@ -67,7 +68,7 @@
 
 (defn- gen-sequence
   "Generate a weight sequence for words of length n formed from an alphabet of
-   cardinality p (prime), containing every mth power of 2 modulo p"
+  cardinality p (prime), containing every mth power of 2 modulo p"
   [p n m]
   (let [alphas (powers-of-n p 2)]
     (->> (iterate #(mod (+ m %) (dec p)) m)
@@ -77,15 +78,14 @@
 
 (defn- weight-sequences
   "Calculate weight sequences from the parameters [a b] for words with encoded length n
-   formed from an alphabet of cardinality p (prime)."
+  formed from an alphabet of cardinality p (prime)."
   [p n [a b]]
   (mapv (partial gen-sequence p n) [a b]))
 
 (defn weight-scheme
-  "For a desired encoded word length n and alphabet size p (prime), calculate the
-   weight parameters and sequences that will be used in encoding and correcting.
-   Returns a map of the weight parameters :a and :b, the weight sequences :w and :w,'
-   the alphabet size and word length :p and :n, and the :method (= 2)"
+  "For a desired encoded word length n and alphabet a of prime cardinality,
+  returns a map containing the weight parameters and sequences that will be used
+  in encoding and correction."
   [alpha n]
   (let [p (count alpha)
         [a b] (weight-parameters p)

@@ -5,9 +5,9 @@
    of the alphabet")
 
 (defn weight-scheme
-  "For a desired encoded word length n and alphabet a of prime cardinality, returns
-   a map containing the weight parameters and sequences that will be used in
-   encoding and correction."
+  "For a desired encoded word length n and alphabet a of prime cardinality, 
+  returns a map containing the weight parameters and sequences that will be used
+  in encoding and correction."
   [alpha n]
   (let [p (count alpha)
         N (int (Math/floor (/ (+ p 2) 3)))

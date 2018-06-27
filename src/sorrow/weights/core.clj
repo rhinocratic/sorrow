@@ -4,10 +4,10 @@
             [sorrow.numeric :as n]))
 
 (defn weight-scheme
-  "Choose the method of calculating a weight scheme for encoding/correcting words,
-   based upon the size of alphabet alpha and desired (encoded) word length n.
-   Where possible, the simpler method 1 will be preferred, only using method 2
-   when longer words are required."
+  "Choose the method of calculating a weight scheme for encoding/correcting
+  words, based upon the cardinality of alphabet alpha and desired (encoded) word
+  length n.  Where possible, the simpler method 1 will be preferred, only using
+  method 2 when longer words are required."
   [alpha n]
   {:pre [(string? alpha)
          (apply distinct? alpha)
@@ -17,5 +17,5 @@
   (let [p (count alpha)
         method1-max (int (Math/floor (/ (+ p 2) 3)))]
     (cond
-      (<= n method1-max) (wm1/weight-scheme p n)
-      :else (wm2/weight-scheme p n))))
+      (<= n method1-max) (wm1/weight-scheme alpha n)
+      :else (wm2/weight-scheme alpha n))))
