@@ -47,6 +47,15 @@
   [p]
   (into {} (map #(vector % (mod-inverse p %)) (range 1 p))))
 
+(defn powers-of-n-mod-p
+  "For p (prime), returns a map of the p-1 distinct powers of n indexed by their exponent.
+   The values of the map will contain all of the non-zero elements of the finite field GF(p)."
+  [p n]
+  (->> (iterate #(mod (* % n) p) n)
+    (take (dec p))
+    (map-indexed #(vector (inc %1) %2))
+    (into {})))
+
 (defn weighted-sum
   "Given a sequence of integers is and a sequence of weights ws,
    return the weighted sum of the integers modulo p."

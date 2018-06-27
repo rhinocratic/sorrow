@@ -14,11 +14,6 @@
     (is (true? (#'sorrow.weights.method2/gcd-lte-2? 2 6)))
     (is (false? (#'sorrow.weights.method2/gcd-lte-2? 12 6)))))
 
-(deftest test-powers-of-n
-  (testing "Generation of distinct powers of n modulo p"
-    (is (= {1 2, 2 4, 3 8, 4 5, 5 10, 6 9, 7 7, 8 3, 9 6, 10 1}
-          (#'sorrow.weights.method2/powers-of-n 11 2)))))
-
 (deftest test-distinct-pairs
   (testing "Generation of distinct unequal pairs from a collection of distinct elements"
     (is (= [[1 2] [1 3] [1 4] [2 3] [2 4] [3 4]]

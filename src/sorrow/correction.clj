@@ -1,7 +1,7 @@
 (ns sorrow.correction
    (:require [sorrow.numeric :as n]
              [sorrow.translation :as t]
-             [sorrow.location.core :as l]))
+             [sorrow.location :as l]))
 
 (defn- checksum-calculator
   "Returns a function that accepts a vector of integers and returns a vector of
@@ -18,6 +18,16 @@
     2 :correct
     1 :uncorrectable
     0 :correctable))
+
+; (defn classify-error
+;   "Classifies an error as :transcription, :transposition or :uncorrectable based
+;    upon the values of error position indicators ep1, ep2."
+;   [n [ep1 ep2]]
+;   (cond
+;     (<= 0 ep1 (dec n))       :transcription
+;     (and (int? ep2)
+;          (<= 0 ep2 (- n 2))) :transposition
+;     :else                    :uncorrectable))
 
 (defn correct-transcription-error
   "Correct a single transcription error"

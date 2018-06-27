@@ -35,12 +35,12 @@
   letters of alphabet alpha.
 
   The corrector returns a map containing the following entries:
-    :original    - the uncorrected word, as supplied to the corrector
     :status      - :correct, :corrected or :uncorrectable
-    :correct     - the corrected word (absent if status is :uncorrectable)
-    :error-type  - :transcription or :transposition if :status is :corrected
-    :error-pos   - position of the error in the word if :status is :corrected"
-
+    :original    - the uncorrected word, as supplied to the corrector
+    :corrected   - the corrected word (absent if :status = :uncorrectable,
+                   same as :original if :status = :correct)
+    :error-type  - :transcription or :transposition if :status = :corrected
+    :error-pos   - position of the error in the word if :status = :corrected"
   [alpha n]
   (-> (w/weight-scheme alpha n)
     (c/corrector)))

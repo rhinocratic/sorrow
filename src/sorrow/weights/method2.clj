@@ -2,26 +2,17 @@
   "Implementation of the second, more complex scheme for deriving weight sequences.
    This scheme permits words of encoded length up to (p - 1)/2 characters, where
    p (prime) is the cardinality of the alphabet."
-  (:require [sorrow.numeric :refer [gcd]]))
+  (:require [sorrow.numeric :as n]))
 
 (defn- diff-coprime?
   "Predicate returning true if the greatest common divisor of x and (b - a) is 1."
   [x [a b]]
-  (= 1 (last (gcd x (- b a)))))
+  (= 1 (last (n/gcd x (- b a)))))
 
 (defn- gcd-lte-2?
   "Predicate returning true if the greatest common divisor of x, y is no greater than 2."
   [x y]
-  (<= (last (gcd x y)) 2))
-
-(defn- powers-of-n
-  "For p (prime), returns a map of the p-1 distinct powers of n indexed by their exponent.
-   The values of the map will contain all of the non-zero elements of the finite field GF(p)."
-  [p n]
-  (->> (iterate #(mod (* % n) p) n)
-    (take (dec p))
-    (map-indexed #(vector (inc %1) %2))
-    (into {})))
+  (<= (last (n/gcd x y)) 2))
 
 (defn- distinct-pairs
   "Find all distinct pairs (when considered as sets) of unequal elements from a
@@ -38,9 +29,9 @@
   "For prime p, returns a predicate that accepts a vector of integers [a b] and is true when
   2^a + 2^b ≡ 2 (mod p) or β^a - β^b ≡ 2 (mod p) where β = 2^((p - 3) / 2) with a even, b odd."
   [p]
-  (let [alphas (powers-of-n p 2)
+  (let [alphas (n/powers-of-n-mod-p p 2)
         beta (apply * (repeat (/ (- p 3) 2) 2))
-        betas (powers-of-n p beta)]
+        betas (n/powers-of-n-mod-p p beta)]
     (fn [[a b]]
       (or
         (= 2 (mod (+ (alphas a) (alphas b)) p))
@@ -70,7 +61,7 @@
   "Generate a weight sequence for words of length n formed from an alphabet of
   cardinality p (prime), containing every mth power of 2 modulo p"
   [p n m]
-  (let [alphas (powers-of-n p 2)]
+  (let [alphas (n/powers-of-n-mod-p p 2)]
     (->> (iterate #(mod (+ m %) (dec p)) m)
       (take n)
       (replace {0 (dec p)})
