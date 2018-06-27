@@ -1,6 +1,6 @@
-(ns sorrow.correction.method2)
+(ns sorrow.location.method2)
 
-(defn corrector
+(defn locator
   "Returns an error detector function for the given weight scheme, accepting
    integer vectors of length n and returning a map containing:
      :error-type - :transcription or :transposition (if correctable)

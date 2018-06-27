@@ -1,8 +1,7 @@
-(ns sorrow.correction.core
+(ns sorrow.correction
    (:require [sorrow.numeric :as n]
              [sorrow.translation :as t]
-             [sorrow.correction.method1 :as cm1]
-             [sorrow.correction.method1 :as cm2]))
+             [sorrow.location.core :as l]))
 
 (defn- checksum-calculator
   "Returns a function that accepts a vector of integers and returns a vector of
@@ -36,21 +35,36 @@
 (defn- correct-error
   "Correct an error if possible, returning a map for merging with the output
    of the corrector."
-  [p {:keys [status original error-type error-pos error-size] :as det}]
+  [{:keys [status original error-type error-pos error-size] :as det}]
   (if (= status :uncorrectable)
-    (select-keys det status)
+    (select-keys det [:original :status])
     (merge (dissoc det :error-size)
       {:correct
        (condp = error-type
          :transcription (correct-transcription-error original error-pos error-size)
          :transposition (correct-transposition-error original error-pos))})))
 
-(defn correct-word
-  [])
+; (defn- error-detector
+;   "Create an error detector for the given weight scheme"
+;   [{:keys [method]}]
+;   (if (= method 1)
+;     (cm1/detector ws)
+;     (cm2/detector ws)))
+
+(defn- error-corrector
+  "Create an error corrector for the given weight scheme"
+  [{:keys [p n]}])
+
+(defn- update-if-exists
+  "Update a map entry if it exists"
+  [m k f]
+  (if (contains? m k)
+    (update m k f)
+    m))
 
 (defn corrector
-  "Returns an error corrector function for the given weight scheme.  The
-  detector accepts a vector of integers representing a word, and returns a map
+  "Returns a validator/corrector function for the given weight scheme.  The
+  function accepts a vector of integers representing a word, and returns a map
   containing the following:
     :original    - the uncorrected word, as supplied to the corrector
     :status      - :correct, :corrected or :uncorrectable
@@ -58,19 +72,19 @@
     :error-type  - :transcription or :transposition if :status is :corrected
     :error-pos   - position of the error in the word if :status is :corrected"
   [{:keys [p n alphabet method] :as ws}]
-  (let [calc (checksum-calculator ws)
+  (let [check (checksum-calculator ws)
+        ; detect-error (error-detector ws)
+        correct-error (error-corrector ws)
         to-ints (t/str->ints alphabet)
-        to-str (t/ints->str alphabet)
-        det (if (= method 1)
-              (cm1/detector)
-              (cm2/detector))]
+        to-str (t/ints->str alphabet)]
     (fn [w]
-      {:pre [(every? (set alphabet) w) (= (- n 2) (count w))]}
+      {:pre [(every? (set alphabet) w) (= n (count w))]}
       (-> w
         to-ints
-        correct-word
+        ; detect-error
+        correct-error
         (update :original to-str)
-        (update :correct to-str)))))
+        (update-if-exists :correct to-str)))))
 
     ; (fn [word]
     ;   (let [[s1 s2] (calc word)

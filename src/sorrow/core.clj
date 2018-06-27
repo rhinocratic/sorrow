@@ -4,7 +4,7 @@
   https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data"
    (:require [sorrow.weights.core :as w]
              [sorrow.encoding :as e]
-             [sorrow.correction.core :as c]))
+             [sorrow.correction :as c]))
 
 (def alphanumeric-upper-case
   "An alphabet containing digits and upper case letters, plus '*' to make the
@@ -31,7 +31,7 @@
     (e/encoder)))
 
 (defn corrector
-  "Returns a corrector/validator for encoded words of length n formed from
+  "Returns a validator/corrector for encoded words of length n formed from
   letters of alphabet alpha.
 
   The corrector returns a map containing the following entries:

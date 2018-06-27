@@ -15,12 +15,12 @@
 (defn encoder
   "Returns an encoder for the given weight scheme."
   [{:keys [n w w' alphabet] :as ws}]
-  (let [appender (checksum-appender ws)
+  (let [add-checksum (checksum-appender ws)
         to-ints (t/str->ints alphabet)
         to-str (t/ints->str alphabet)]
     (fn [w]
       {:pre [(every? (set alphabet) w) (= (- n 2) (count w))]}
       (-> w
         to-ints
-        appender
+        add-checksum
         to-str))))
