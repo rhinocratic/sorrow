@@ -1,6 +1,5 @@
 (ns sorrow.encoding
-  (:require [clojure.spec.alpha :as s]
-            [sorrow.translation :as t]
+  (:require [sorrow.translation :as t]
             [sorrow.weights.core :as w]
             [sorrow.numeric :as n]))
 
@@ -14,7 +13,7 @@
             [x y] (solve a b)]
         (conj nums x y)))))
 
-(defn- encoder-for-weight-scheme
+(defn encoder-for-weight-scheme
   "Returns an encoder for the given weight scheme."
   [{:keys [n w w' alphabet] :as ws}]
   (let [appender (checksum-appender ws)]
@@ -24,10 +23,3 @@
         ((t/str->ints alphabet))
         appender
         ((t/ints->str alphabet))))))
-
-(defn encoder
-  "Returns an encoder for words of encoded length n formed from letters of the alphabet a."
-  [a n]
-  {:pre [(s/valid? ::alphabet a) (s/valid? ::scheme [(count a) n])]}
-  (-> (w/weight-scheme a n)
-    (encoder-for-weight-scheme)))

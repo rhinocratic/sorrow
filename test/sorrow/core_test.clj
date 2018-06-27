@@ -3,7 +3,9 @@
             [sorrow.core :refer :all]
             [sorrow.weights.method2 :as wm2]))
 
-; (deftest test-choose-method
-;   (testing "Condition for choosing the method for generating a weight scheme"
-;     (is (= [:method1 :method1 :method1 :method2 :method2]
-;           (map (partial #'sorrow.core/choose-method 37) (range 6 19 3))))))
+
+
+; (deftest test-encoder
+;   (testing "Creation of encoder for correct weight scheme"
+;     (let [enc (encoder alphanumeric-upper-case 8)]
+;       (is (= "4H9SC5ZC" (enc "4H9SC5"))))))
