@@ -5,7 +5,7 @@
    (:require [clojure.spec.alpha :as s]
              [sorrow.weights.core :as w]
              [sorrow.encoding :as e]
-             [sorrow.correction :as c]))
+             [sorrow.correction.core :as c]))
 
 (def alphanumeric-upper-case
   "An alphabet containing digits and upper case letters, plus '*' to make the

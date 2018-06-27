@@ -18,4 +18,4 @@
         method1-max (int (Math/floor (/ (+ p 2) 3)))]
     (cond
       (<= n method1-max) (wm1/weight-scheme alpha n)
-      :else (wm2/weight-scheme alpha n))))
+      :else              (wm2/weight-scheme alpha n))))
