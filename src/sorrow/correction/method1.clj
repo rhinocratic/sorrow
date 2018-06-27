@@ -21,13 +21,13 @@
          (<= 0 ep2 (- n 2))) :transposition
     :else                    :uncorrectable))
 
-(defn error-corrector
-  "Returns an error corrector function for the given weight scheme, accepting
+(defn detector
+  "Returns an error detector function for the given weight scheme, accepting
    integer vectors of length n and returning a map containing:
-   - :corrected - the corrected word (omitted if uncorrectable)
-   - :uncorrected - the uncorrected word
-   - :error-type - :transcription, :transposition or :uncorrectable
-   - :error-position - the position at which the error occurs (omitted if uncorrectable)"
+     :error-type - :transcription or :transposition (if correctable)
+     :error-pos  - position of the error (if corrected)
+     :error-size - magnitude of the error (only for transcription errors)
+     :status     - only present if the value is :uncorrectable"
   [ws]
   (let [pos (error-position-finder ws)]
     (fn [])))

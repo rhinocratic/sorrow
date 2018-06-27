@@ -12,8 +12,8 @@
           appender (#'sorrow.encoding/checksum-appender ws)]
       (is (= [4 17 9 28 12 5 35 12] (appender [4 17 9 28 12 5]))))))
 
-(deftest test-encoder-for-weight-scheme
+(deftest test-encoder
   (testing "Example encoding by method 2"
     (let [ws (wm2/weight-scheme alphanumeric-upper-case 8)
-          enc (encoder-for-weight-scheme ws)]
+          enc (encoder ws)]
       (is (= "4H9SC5ZC" (enc "4H9SC5"))))))

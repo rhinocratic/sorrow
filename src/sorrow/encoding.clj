@@ -7,18 +7,20 @@
    digits calculated from the given weight scheme."
   [{:keys [p w w']}]
   (let [solve (n/simultaneous-congruence-solver p)]
-    (fn [nums]
-      (let [[a b] (map #(conj (vec (take-last 2 %)) (n/weighted-sum p nums %)) [w w'])
+    (fn [word]
+      (let [[a b] (map #(conj (vec (take-last 2 %)) (n/weighted-sum p word %)) [w w'])
             [x y] (solve a b)]
-        (conj nums x y)))))
+        (conj word x y)))))
 
-(defn encoder-for-weight-scheme
+(defn encoder
   "Returns an encoder for the given weight scheme."
   [{:keys [n w w' alphabet] :as ws}]
-  (let [appender (checksum-appender ws)]
+  (let [appender (checksum-appender ws)
+        to-ints (t/str->ints alphabet)
+        to-str (t/ints->str alphabet)]
     (fn [w]
       {:pre [(every? (set alphabet) w) (= (- n 2) (count w))]}
       (-> w
-        ((t/str->ints alphabet))
+        to-ints
         appender
-        ((t/ints->str alphabet))))))
+        to-str))))
