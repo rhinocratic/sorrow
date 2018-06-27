@@ -1,4 +1,4 @@
-(ns sorrow.srk.numeric)
+(ns sorrow.numeric)
 
 (def ^{:private true} possible-primes
   "A list of integers starting with 2, 3 and followed by all integers of the form 6k±1.
@@ -42,6 +42,11 @@
     (first)
     (mod p)))
 
+(defn inverses-mod-p
+  "Returns a map of inverses mod p of the integers 1, ..., p-1"
+  [p]
+  (into {} (map #(vector % (mod-inverse p %)) (range p))))
+
 (defn weighted-sum
   "Given a sequence of integers is and a sequence of weights ws,
    return the weighted sum of the integers modulo p."
@@ -76,7 +81,7 @@
   "Returns a function that accepts parameters r, s and finds a solution x for
    the linear congruence r.x + s ≡ 0 (mod p)"
   [p]
-  (let [inverses (into {} (map #(vector % (mod-inverse p %)) (range p)))]
+  (let [inverses (inverses-mod-p p)]
     (fn [[r s]]
       (let [t (mod (- p s) p)]
         (mod (* t (inverses r)) p)))))

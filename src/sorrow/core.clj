@@ -1,11 +1,11 @@
-(ns sorrow.srk.core
+(ns sorrow.core
   "Implements the error-correcting coding scheme for alphanumeric data described by
    A.S. Sethi, V. Rajaraman and P.S. Kenjale in their paper:
    https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data"
    (:require [clojure.spec.alpha :as s]
-             [sorrow.srk.numeric :as n]
-             [sorrow.srk.weights.method1 :as wm1]
-             [sorrow.srk.weights.method2 :as wm2]))
+             [sorrow.numeric :as n]
+             [sorrow.weights.method1 :as wm1]
+             [sorrow.weights.method2 :as wm2]))
 
 (def alphanumeric-upper-case
   "An alphabet containing digits and upper case letters, plus '*' to make the cardinality prime"
@@ -86,22 +86,25 @@
     (encoder-for-weight-scheme a n ws)))
 
 (defn- checksum-calculator
-  "Returns a function that accepts a vector of integers of length n and returns a vector of
-   two checksums calculated from the given weight sequences."
+  "Returns a function that accepts a vector of integers of length n and returns
+   a vector of two checksums calculated from the given weight sequences w, w'."
   [p {:keys [w w']}]
   (fn [nums]
     (mapv #(n/weighted-sum p nums %) [w w'])))
 
 (defn- classify-checksums
-  "Return :correct, :uncorrectable or :correctable depending upon the values of s1, s2."
+  "Return :correct, :uncorrectable or :correctable depending upon the values of
+   checksums s1, s2."
   [[s1 s2]]
   (condp = (count (filter zero? [s1 s2]))
     2 :correct
     1 :uncorrectable
     0 :correctable))
 
-(defn- validator-for-weight-scheme
-  [a n {:keys [w w' method]}])
+; (defn- corrector-for-weight-scheme
+;   [a n {:keys [w w' method]}]
+;   (if (= 1 method)))
+;
 
 (defn validator
   "Returns a validator for words of encoded length n formed from letters of the alphabet a."

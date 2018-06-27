@@ -1,8 +1,8 @@
-(ns sorrow.srk.weights.method2
+(ns sorrow.weights.method2
   "Implementation of the second, more complex scheme for deriving weight sequences.
    This scheme permits words of encoded length up to (p - 1)/2 characters, where
    p (prime) is the cardinality of the alphabet."
-  (:require [sorrow.srk.numeric :refer [gcd]]))
+  (:require [sorrow.numeric :refer [gcd]]))
 
 (defn- diff-coprime?
   "Predicate returning true if the greatest common divisor of x and (b - a) is 1."
@@ -84,9 +84,9 @@
 (defn weight-scheme
   "For a desired encoded word length n and alphabet size p (prime), calculate the
    weight parameters and sequences that will be used in encoding and correcting.
-   Returns a map of the weight parameters :a and :b, the weight sequences :w, :w'
-   and the :method (= 2)"
+   Returns a map of the weight parameters :a and :b, the weight sequences :w and :w,'
+   the alphabet size and word length :p and :n, and the :method (= 2)"
   [p n]
   (let [[a b] (weight-parameters p)
         [w w'] (weight-sequences p n [a b])]
-    {:a a :b b :w w :w' w' :method 2}))
+    {:p p :n n :a a :b b :w w :w' w' :method 2}))

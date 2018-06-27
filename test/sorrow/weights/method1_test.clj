@@ -1,10 +1,12 @@
-(ns sorrow.srk.weights.method1-test
+(ns sorrow.weights.method1-test
   (:require [clojure.test :refer :all]
-            [sorrow.srk.weights.method1 :refer :all]))
+            [sorrow.weights.method1 :refer :all]))
 
 (deftest test-weight-scheme
   (testing "Calculation of weight scheme"
     (is (= {:method 1
+            :p 37
+            :n 13
             :a 11
             :b 0
             :w [12 13 14 15 16 17 18 19 20 21 22 23 24]
