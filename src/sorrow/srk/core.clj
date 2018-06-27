@@ -84,3 +84,27 @@
   {:pre [(s/valid? ::alphabet a) (s/valid? ::scheme [(count a) n])]}
   (let [ws (weight-scheme a n)]
     (encoder-for-weight-scheme a n ws)))
+
+(defn- checksum-calculator
+  "Returns a function that accepts a vector of integers of length n and returns a vector of
+   two checksums calculated from the given weight sequences."
+  [p {:keys [w w']}]
+  (fn [nums]
+    (mapv #(n/weighted-sum p nums %) [w w'])))
+
+(defn- classify-checksums
+  "Return :correct, :uncorrectable or :correctable depending upon the values of s1, s2."
+  [[s1 s2]]
+  (condp = (count (filter zero? [s1 s2]))
+    2 :correct
+    1 :uncorrectable
+    0 :correctable))
+
+(defn- validator-for-weight-scheme
+  [a n {:keys [w w' method]}])
+
+(defn validator
+  "Returns a validator for words of encoded length n formed from letters of the alphabet a."
+  [a n]
+  {:pre [(s/valid? ::alphabet a) (s/valid? ::scheme [(count a) n])]}
+  (let [ws (weight-scheme a n)]))

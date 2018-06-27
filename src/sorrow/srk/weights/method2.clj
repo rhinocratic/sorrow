@@ -84,8 +84,9 @@
 (defn weight-scheme
   "For a desired encoded word length n and alphabet size p (prime), calculate the
    weight parameters and sequences that will be used in encoding and correcting.
-   Returns a map of the weight parameters :a, :b and the weight sequences :w, :w'."
+   Returns a map of the weight parameters :a and :b, the weight sequences :w, :w'
+   and the :method (= 2)"
   [p n]
   (let [[a b] (weight-parameters p)
         [w w'] (weight-sequences p n [a b])]
-    {:a a :b b :w w :w' w'}))
+    {:a a :b b :w w :w' w' :method 2}))

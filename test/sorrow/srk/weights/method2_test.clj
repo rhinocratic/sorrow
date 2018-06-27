@@ -56,12 +56,14 @@
 
 (deftest test-weight-scheme
   (testing "Creation of weight scheme"
-    (is (= {:a 2
+    (is (= {:method 2
+            :a 2
             :b 19
             :w [4 16 27 34 25 26 30 9 36 33 21 10 3 12 11 7 28 1]
             :w' [35 4 29 16 5 27 20 34 6 25 24 26 22 30 14 9 19 36]}
           (weight-scheme 37 18)))
-    (is (= {:a 2
+    (is (= {:method 2
+            :a 2
             :b 19
             :w [4 16 27 34 25 26 30 9]
             :w' [35 4 29 16 5 27 20 34]}

@@ -16,19 +16,3 @@
           (<= 0 ep1 (dec n)) {:transcription ep1}
           (and (int? ep2) (<= 0 ep2 (- n 2))) {:transposition ep2}
           :else {:uncorrectable -1})))))
-
-(defn checksum-calculator
-  "Returns a function that calculates the checksums modulo p of a given sequence of integers
-   using the weight sequences supplied.  The function returns a vector of the checksums
-   along with a category of :correctable :uncorrectable or :correct according to the
-   number of checksums (0, 1 or 2) that were zero."
-   [p w w']
-   (fn [nums]
-     (let [checksums (mapv #(n/weighted-sum p nums %) [w w'])
-           num-zeros (count (filter zero? checksums))
-           category (condp = num-zeros
-                      2 :correct
-                      1 :uncorrectable
-                      0 :correctable)]
-
-       (conj checksums category))))
