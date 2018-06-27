@@ -45,7 +45,7 @@
 (defn inverses-mod-p
   "Returns a map of inverses mod p of the integers 1, ..., p-1"
   [p]
-  (into {} (map #(vector % (mod-inverse p %)) (range p))))
+  (into {} (map #(vector % (mod-inverse p %)) (range 1 p))))
 
 (defn weighted-sum
   "Given a sequence of integers is and a sequence of weights ws,

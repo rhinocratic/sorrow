@@ -27,6 +27,11 @@
   (testing "Modular inverse"
     (is (= [1 6 4 3 9 2 8 7 5 10] (map #(mod-inverse 11 %) (range 1 11))))))
 
+(deftest test-inverses-mod-p
+  (testing "Map of inverses mod p"
+    (is (= {1 1, 2 6, 3 4, 4 3, 5 9, 6 2, 7 8, 8 7, 9 5, 10 10}
+          (inverses-mod-p 11)))))
+
 (deftest test-weighted-sum
   (testing "Weighted sum of a sequence of integers modulo p"
     (is (= 17 (weighted-sum 37 [1 2 3 4 5 6] [1 2 3 4 5 6])))))
