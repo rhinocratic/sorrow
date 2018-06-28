@@ -32,23 +32,29 @@
       :else                    :uncorrectable)))
 
 (defn- error-locator
-  "Add error location information to a validation record"
+  "Add error location and type information to a validation record"
   [ws]
-  (let [locate-error (l/error-locator ws)]
+  (let [locate-error (l/error-locator ws)
+        classify-error (error-classifier ws)]
     (fn [{:keys [checksums] :as m}]
-      (let [[ep1 ep2 e] (apply locate-error checksums)]
-        (assoc m :error-pos [ep1 ep2] :error-size e)))))
+      (let [[ep1 ep2 size p] (apply locate-error checksums)
+            type (classify-error ep1 ep2)
+            pos (condp = type
+                 :transcription ep1
+                 :transposition ep2
+                 :uncorrectable 0)]
+        (assoc m :error-pos pos :error-type type :error-size size)))))
 
-(defmulti correct-error
+(defmulti correct
   "Correct a single transcription error or transposition of adjacent characters."
   :error-type)
 
-(defmethod correct-error :transcription
-  [{:keys [nums error-pos error-size] :as m}]
-  (let [cor (update nums error-pos #(- % error-size))]
+(defmethod correct :transcription
+  [{:keys [p nums error-pos error-size] :as m}]
+  (let [cor (update nums error-pos #(mod (- % error-size) p))]
     (assoc m :corrected cor :status :corrected)))
 
-(defmethod correct-error :transposition
+(defmethod correct :transposition
   [{:keys [nums error-pos] :as m}]
   (let [cor (concat
               (take error-pos nums)
@@ -56,7 +62,7 @@
               (drop (+ 2 error-pos) nums))]
     (assoc m :corrected cor :status :corrected)))
 
-(defmethod correct-error :uncorrectable
+(defmethod correct :uncorrectable
   [m]
   (-> m
     (dissoc :error-pos :error-type)
@@ -67,8 +73,9 @@
     :status    - :correct, :uncorrectable or :correctable
     :original  - the original word
     :nums      - the original word as a vector of ints
-    :checksums - a vector containing the 2 checksums"
-  [{:keys [alphabet] :as ws}]
+    :checksums - a vector containing the 2 checksums
+    :p         - the cardinality of the alphabet."
+  [{:keys [p alphabet] :as ws}]
   (let [to-ints (t/str->ints alphabet)
         check (checksum-calculator ws)]
     (fn [w]
@@ -77,7 +84,8 @@
         {:original w
          :nums nums
          :status (checksum-status s1 s2)
-         :checksums [s1 s2]}))))
+         :checksums [s1 s2]
+         :p p}))))
 
 (defn- update-if-exists
   "Update a map if the key k exists"
@@ -97,14 +105,14 @@
     :error-pos   - position of the error in the word if :status is :corrected"
   [{:keys [n alphabet] :as ws}]
   (let [validate (validator ws)
-        locate-error (error-locator ws)
+        locate (error-locator ws)
         to-str (t/ints->str alphabet)]
     (fn [w]
       {:pre [(every? (set alphabet) w) (= n (count w))]}
-      (let [v (validate w)]
-        (-> (condp = (:status v)
-              :correct       (merge v {:correct (:original v)})
-              :correctable   (-> v locate-error correct-error)
-              :uncorrectable v)
+      (let [m (validate w)]
+        (-> (condp = (:status m)
+              :correct       (merge m {:correct (:original m)})
+              :correctable   (-> m locate correct)
+              :uncorrectable m)
           (select-keys [:status :original :corrected :error-type :error-pos])
           (update-if-exists :corrected to-str))))))

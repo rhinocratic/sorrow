@@ -4,20 +4,21 @@
 
 (defmulti error-locator
   "Returns a function that accepts a pair of checksums for a word with errors
-  and returns two integers indicating the position of the error and its
-  magnitude (zero for a transcription error)."
+  and returns a vector containing:
+   2 integers indicating the position of the error
+   1 integer indicating the magnitude of the error (zero for transposition errors)."
   :method)
 
 (defmethod error-locator 1
   [{:keys [p n a b]}]
   (let [inv (n/inverses-mod-p p)]
     (fn [s1 s2]
-      (let [ep1 (dec (mod (- (* s2 (inv s1)) b) p))
-            ep2 (dec (mod (/ (- ep1 a) 2) p))
-            e (if (<= 0 ep1 (dec n))
-                (mod (* s1 (inv (mod (+ ep1 a) p))) p)
+      (let [ep1 (mod (- (* s2 (inv s1)) b) p)
+            ep2 (/ (- ep1 a 1) 2)
+            e (if (<= 1 ep1 n)
+                (mod (* s1 (inv (mod (+ ep1 a) (dec p)))) p)
                 0)]
-        [ep1 ep2 e]))))
+        [(dec ep1) (dec ep2) e]))))
 
 (defmethod error-locator 2
   [{:keys [p n a b]}]
@@ -34,7 +35,7 @@
       (let [k (lgs (mod (* s2 (inv s1)) p))
             ep1 (mod (* r k) (dec p))
             ep2 (mod (+ (* r k) t) (dec p))
-            e (if (<= 0 ep1 (dec n))
+            e (if (<= 1 ep1 n)
                 (mod (* s1 (inv (pwrs (mod (* a ep1) p)))) p)
                 0)]
-        [ep1 ep2 e]))))
+        [(dec ep1) (dec ep2) e]))))
