@@ -31,10 +31,20 @@
     (is (= :uncorrectable (ec 11 12)))))
 
 (deftest test-error-locator
-  (testing "Creation of error locator"
+  (testing "Creation of error locator - method 1"
+    (let [ws {:p 37 :n 8 :a 11 :b 0 :method 1}
+          loc (#'sorrow.correction/error-locator ws)]
+      (is (= {:checksums [19 4] :error-pos [7 34] :error-size 36}
+            (loc {:checksums [19 4]})))
+      (is (= {:checksums [1 26] :error-pos [25 6] :error-size 0}
+            (loc {:checksums [1 26]})))))
+  (testing "Creation of error locator - method 2"
     (let [ws {:p 37 :n 8 :a 2 :b 19 :method 2}
           loc (#'sorrow.correction/error-locator ws)]
-      (is (= {:error-pos 5 :error-size 1} (loc 16 1))))))
+      (is (= {:checksums [16 1] :error-pos [4 22] :error-size 7}
+            (loc {:checksums [16 1]})))
+      (is (= {:checksums [7 6] :error-pos [23 5] :error-size 0}
+            (loc {:checksums [7 6]}))))))
 
 (deftest test-correct--error
   (let [corr #'sorrow.correction/correct-error]
