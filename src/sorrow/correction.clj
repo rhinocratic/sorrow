@@ -11,15 +11,15 @@
     (mapv #(n/weighted-sum p word %) [w w'])))
 
 (defn- classify-checksums
-  "Return :correct, :uncorrectable or :correctable depending upon the values of
-   checksums s1, s2."
+  "Return :correct, :uncorrectable or :potentially-correctable depending upon
+  the values of checksums s1, s2."
   [s1 s2]
   (condp = (count (filter zero? [s1 s2]))
     2 :correct
     1 :uncorrectable
-    0 :correctable))
+    0 :potentially-correctable))
 
-(defn error-classifier
+(defn- error-classifier
   "Returns a function that classifies a potentially correctable error as
   :transcription, :transposition or :uncorrectable based upon the values of
   error position indicators ep1, ep2."
@@ -31,28 +31,18 @@
            (<= 0 ep2 (- n 2))) :transposition
       :else                    :uncorrectable)))
 
-(defn correct-transcription-error
+(defn- correct-transcription-error
   "Correct a single transcription error"
   [word pos size]
   (update word pos #(- % size)))
 
-(defn correct-transposition-error
+(defn- correct-transposition-error
   "Correct a transposition of adjacent characters"
   [word pos]
   (concat
     (take pos word)
     [(word (inc pos)) (word pos)]
     (drop (+ 2 pos) word)))
-
-; (defn classify-error
-;   "Classifies an error as :transcription, :transposition or :uncorrectable based
-;    upon the values of error position indicators ep1, ep2."
-;   [n [ep1 ep2]]
-;   (cond
-;     (<= 0 ep1 (dec n))       :transcription
-;     (and (int? ep2)
-;          (<= 0 ep2 (- n 2))) :transposition
-;     :else                    :uncorrectable))
 
 (defn- correct-error
   "Correct an error if possible, returning a map for merging with the output
@@ -85,6 +75,7 @@
   [{:keys [p n alphabet method] :as ws}]
   (let [checksums (checksum-calculator ws)
         locate-error (l/error-locator ws)
+        classify-error (error-classifier ws)
         to-ints (t/str->ints alphabet)
         to-str (t/ints->str alphabet)]
     (fn [w]

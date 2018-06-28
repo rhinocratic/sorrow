@@ -20,7 +20,7 @@
   (testing "Classification of checksum pairs"
     (is (= :correct (#'sorrow.correction/classify-checksums 0 0)))
     (is (= :uncorrectable (#'sorrow.correction/classify-checksums 5 0)))
-    (is (= :correctable (#'sorrow.correction/classify-checksums 7 6)))))
+    (is (= :potentially-correctable (#'sorrow.correction/classify-checksums 7 6)))))
 
 (deftest test-error-classifier
   (testing "Classification of potentially correctable errors")
