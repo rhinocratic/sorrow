@@ -36,7 +36,7 @@
   (/ (* m n) (last (gcd m n))))
 
 (defn mod-inverse
-  "Find the multiplicative inverse of n mod p, where p is prime"
+  "Find the multiplicative inverse of n mod p"
   [p n]
   (-> (gcd n p)
     (first)
