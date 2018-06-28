@@ -22,6 +22,13 @@
     (is (= :uncorrectable (#'sorrow.correction/classify-checksums 5 0)))
     (is (= :correctable (#'sorrow.correction/classify-checksums 7 6)))))
 
+(deftest test-error-classifier
+  (testing "Classification of potentially correctable errors")
+  (let [ec (#'sorrow.correction/error-classifier {:n 8})]
+    (is (= :transcription (ec 5 32)))
+    (is (= :transposition (ec 12 4)))
+    (is (= :uncorrectable (ec 11 12)))))
+
 (deftest test-correct-transcription-error
   (testing "Correction of transcription errors"
     (is (= [1 2 3 4] (#'sorrow.correction/correct-transcription-error [1 2 42 4] 2 39)))))

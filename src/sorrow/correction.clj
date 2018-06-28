@@ -19,6 +19,18 @@
     1 :uncorrectable
     0 :correctable))
 
+(defn error-classifier
+  "Returns a function that classifies a potentially correctable error as
+  :transcription, :transposition or :uncorrectable based upon the values of
+  error position indicators ep1, ep2."
+  [{:keys [n]}]
+  (fn [ep1 ep2]
+    (cond
+      (<= 0 ep1 (dec n))       :transcription
+      (and (int? ep2)
+           (<= 0 ep2 (- n 2))) :transposition
+      :else                    :uncorrectable)))
+
 (defn correct-transcription-error
   "Correct a single transcription error"
   [word pos size]
@@ -80,10 +92,8 @@
       (-> w
         to-ints
         checksums
-        ; detect-error
-        correct-error
         (update :original to-str)
-        (update-if-exists :correct to-str)))))
+        (update-if-exists :corrected to-str)))))
 
     ; (fn [word]
     ;   (let [[s1 s2] (calc word)
