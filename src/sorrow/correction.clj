@@ -19,16 +19,6 @@
     1 :uncorrectable
     0 :correctable))
 
-; (defn classify-error
-;   "Classifies an error as :transcription, :transposition or :uncorrectable based
-;    upon the values of error position indicators ep1, ep2."
-;   [n [ep1 ep2]]
-;   (cond
-;     (<= 0 ep1 (dec n))       :transcription
-;     (and (int? ep2)
-;          (<= 0 ep2 (- n 2))) :transposition
-;     :else                    :uncorrectable))
-
 (defn correct-transcription-error
   "Correct a single transcription error"
   [word pos size]
@@ -40,7 +30,17 @@
   (concat
     (take pos word)
     [(word (inc pos)) (word pos)]
-    (drop (inc pos) word)))
+    (drop (+ 2 pos) word)))
+
+; (defn classify-error
+;   "Classifies an error as :transcription, :transposition or :uncorrectable based
+;    upon the values of error position indicators ep1, ep2."
+;   [n [ep1 ep2]]
+;   (cond
+;     (<= 0 ep1 (dec n))       :transcription
+;     (and (int? ep2)
+;          (<= 0 ep2 (- n 2))) :transposition
+;     :else                    :uncorrectable))
 
 (defn- correct-error
   "Correct an error if possible, returning a map for merging with the output
@@ -53,17 +53,6 @@
        (condp = error-type
          :transcription (correct-transcription-error original error-pos error-size)
          :transposition (correct-transposition-error original error-pos))})))
-
-; (defn- error-detector
-;   "Create an error detector for the given weight scheme"
-;   [{:keys [method]}]
-;   (if (= method 1)
-;     (cm1/detector ws)
-;     (cm2/detector ws)))
-
-(defn- error-corrector
-  "Create an error corrector for the given weight scheme"
-  [{:keys [p n]}])
 
 (defn- update-if-exists
   "Update a map entry if it exists"
@@ -82,15 +71,15 @@
     :error-type  - :transcription or :transposition if :status is :corrected
     :error-pos   - position of the error in the word if :status is :corrected"
   [{:keys [p n alphabet method] :as ws}]
-  (let [check (checksum-calculator ws)
-        ; detect-error (error-detector ws)
-        correct-error (error-corrector ws)
+  (let [checksums (checksum-calculator ws)
+        locate-error (l/error-locator ws)
         to-ints (t/str->ints alphabet)
         to-str (t/ints->str alphabet)]
     (fn [w]
       {:pre [(every? (set alphabet) w) (= n (count w))]}
       (-> w
         to-ints
+        checksums
         ; detect-error
         correct-error
         (update :original to-str)
