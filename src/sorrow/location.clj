@@ -19,22 +19,16 @@
   [{:keys [p n a b]}]
   (let [inv (n/inverses-mod-p p)
         pwrs (n/powers-of-n-mod-p p 2)
-        kmap (s/map-invert pwrs)]
+        lgs (s/map-invert pwrs)
+        r (n/mod-inverse 36 (- b a))
+        t (mod (* r (- (lgs (mod (* (mod (dec (pwrs b)) p) (inv (mod (dec (pwrs a)) p))) p)))) (- (dec p)))]
     (fn [s1 s2]
-      (let [k (kmap (mod (* s2 (inv s1)) p))
-            _ (println "k" k)
-            r (n/mod-inverse 36 (- b a))
-            _ (println "r" r)
-            t (mod (* r (- (kmap (mod (* (mod (dec (pwrs b)) p) (inv (mod (dec (pwrs a)) p))) p)))) (- (dec p)))
-            _ (println "t" t)
+      (let [k (lgs (mod (* s2 (inv s1)) p))
             ep1 (mod (* r k) (dec p))
-            _ (println "J" ep1)
             ep2 (mod (+ (* r k) t) (dec p))
-            _ (println "J'" ep2)
             e (if (<= 0 ep1 (dec n))
                 (mod (* s1 (inv (pwrs (mod (* a ep1) p)))) p)
-                0)
-            _ (println "e" e)]
+                0)]
         [ep1 ep2 e]))))
 
 (defn error-locator
