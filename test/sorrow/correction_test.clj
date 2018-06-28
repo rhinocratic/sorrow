@@ -1,6 +1,7 @@
 (ns sorrow.correction-test
   (:require [clojure.test :refer :all]
-            [sorrow.correction :refer :all]))
+            [sorrow.correction :refer :all]
+            [sorrow.core :as c]))
 
 (deftest test-checksum-calculator
   (testing "Calculation of checksums - weight scheme for method 1"
@@ -16,11 +17,11 @@
       (is (= [16 1] (calc [4 17 9 35 12 5 35 12])))
       (is (= [7 6] (calc [4 17 9 28 5 12 35 12]))))))
 
-(deftest test-classify-checksums
-  (testing "Classification of checksum pairs"
-    (is (= :correct (#'sorrow.correction/classify-checksums 0 0)))
-    (is (= :uncorrectable (#'sorrow.correction/classify-checksums 5 0)))
-    (is (= :potentially-correctable (#'sorrow.correction/classify-checksums 7 6)))))
+(deftest test-checksum-status
+  (testing "Classification of checksum pairs according to status"
+    (is (= :correct (#'sorrow.correction/checksum-status 0 0)))
+    (is (= :uncorrectable (#'sorrow.correction/checksum-status 5 0)))
+    (is (= :correctable (#'sorrow.correction/checksum-status 7 6)))))
 
 (deftest test-error-classifier
   (testing "Classification of potentially correctable errors")
@@ -29,12 +30,37 @@
     (is (= :transposition (ec 12 4)))
     (is (= :uncorrectable (ec 11 12)))))
 
-(deftest test-correct-transcription-error
-  (testing "Correction of transcription errors"
-    (is (= [1 2 3 4] (#'sorrow.correction/correct-transcription-error [1 2 42 4] 2 39)))))
+(deftest test-correct--error
+  (let [corr #'sorrow.correction/correct-error]
+    (testing "Correction of transcription errors"
+      (is (= [1 2 3 4] (:corrected (corr {:nums [1 2 42 4] :error-pos 2 :error-size 39 :error-type :transcription})))))
+    (testing "Correction of transposition errors"
+      (is (= [1 2 3 4] (:corrected (corr {:nums [2 1 3 4] :error-pos 0 :error-type :transposition}))))
+      (is (= [1 2 3 4] (:corrected (corr {:nums [1 3 2 4] :error-pos 1 :error-type :transposition}))))
+      (is (= [1 2 3 4] (:corrected (corr {:nums [1 2 4 3] :error-pos 2 :error-type :transposition})))))
+    (testing "Handling of uncorrectable errors"
+      (is (= {:status :uncorrectable :original "flib"}
+            (corr {:error-pos 42 :error-type :uncorrectable :original "flib"}))))))
 
-(deftest test-correct-transposition-error
-  (testing "Correction of transposition errors"
-    (is (= [1 2 3 4] (#'sorrow.correction/correct-transposition-error [2 1 3 4] 0)))
-    (is (= [1 2 3 4] (#'sorrow.correction/correct-transposition-error [1 3 2 4] 1)))
-    (is (= [1 2 3 4] (#'sorrow.correction/correct-transposition-error [1 2 4 3] 2)))))
+(deftest test-word-classifier
+  (testing "Classification of words according to their checksums"
+    (let [ws {:p 37
+              :w [4 16 27 34 25 26 30 9]
+              :w' [35 4 29 16 5 27 20 34]
+              :alphabet c/alphanumeric-upper-case}
+          classify (#'sorrow.correction/word-classifier ws)]
+      (is (= {:original "4H9SC5ZC"
+              :nums [4 17 9 28 12 5 35 12]
+              :status :correct
+              :checksums [0 0]}
+            (classify "4H9SC5ZC")))
+      (is (= {:original "4H9ZC5ZC"
+              :nums [4 17 9 35 12 5 35 12]
+              :status :correctable
+              :checksums [16 1]}
+            (classify "4H9ZC5ZC")))
+      (is (= {:original "4H9S5CZC"
+              :nums [4 17 9 28 5 12 35 12]
+              :status :correctable
+              :checksums [7 6]}
+            (classify "4H9S5CZC"))))))

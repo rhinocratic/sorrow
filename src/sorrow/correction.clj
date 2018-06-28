@@ -7,17 +7,17 @@
   "Returns a function that accepts a vector of integers and returns a vector of
    two checksums calculated from the given weight scheme."
   [{:keys [p w w']}]
-  (fn [word]
-    (mapv #(n/weighted-sum p word %) [w w'])))
+  (fn [nums]
+    (mapv #(n/weighted-sum p nums %) [w w'])))
 
-(defn- classify-checksums
-  "Return :correct, :uncorrectable or :potentially-correctable depending upon
+(defn- checksum-status
+  "Return :correct, :uncorrectable or :correctable depending upon
   the values of checksums s1, s2."
   [s1 s2]
   (condp = (count (filter zero? [s1 s2]))
     2 :correct
     1 :uncorrectable
-    0 :potentially-correctable))
+    0 :correctable))
 
 (defn- error-classifier
   "Returns a function that classifies a potentially correctable error as
@@ -31,37 +31,59 @@
            (<= 0 ep2 (- n 2))) :transposition
       :else                    :uncorrectable)))
 
-(defn- correct-transcription-error
-  "Correct a single transcription error"
-  [word pos size]
-  (update word pos #(- % size)))
+(defmulti correct-error
+  "Correct a single transcription error or transposition of adjacent characters."
+  :error-type)
 
-(defn- correct-transposition-error
-  "Correct a transposition of adjacent characters"
-  [word pos]
-  (concat
-    (take pos word)
-    [(word (inc pos)) (word pos)]
-    (drop (+ 2 pos) word)))
+(defmethod correct-error :transcription
+  [{:keys [nums error-pos error-size] :as m}]
+  (let [cor (update nums error-pos #(- % error-size))]
+    (assoc m :corrected cor)))
 
-(defn- correct-error
-  "Correct an error if possible, returning a map for merging with the output
-   of the corrector."
-  [{:keys [status original error-type error-pos error-size] :as det}]
-  (if (= status :uncorrectable)
-    (select-keys det [:original :status])
-    (merge (dissoc det :error-size)
-      {:correct
-       (condp = error-type
-         :transcription (correct-transcription-error original error-pos error-size)
-         :transposition (correct-transposition-error original error-pos))})))
+(defmethod correct-error :transposition
+  [{:keys [nums error-pos] :as m}]
+  (let [cor (concat
+              (take error-pos nums)
+              [(nums (inc error-pos)) (nums error-pos)]
+              (drop (+ 2 error-pos) nums))]
+    (assoc m :corrected cor)))
 
-(defn- update-if-exists
-  "Update a map entry if it exists"
-  [m k f]
-  (if (contains? m k)
-    (update m k f)
-    m))
+(defmethod correct-error :uncorrectable
+  [m]
+  (-> m
+    (dissoc :error-pos :error-type)
+    (assoc :status :uncorrectable)))
+
+
+(defn word-classifier
+  "Returns a function that accepts a word and returns a map containing:
+    :original  - the original word
+    :nums      - the original word as a vector of ints
+    :status    - :correct, :uncorrectable or :correctable
+    :checksums - a vector containing the 2 checksums"
+  [{:keys [alphabet] :as ws}]
+  (let [to-ints (t/str->ints alphabet)
+        check (checksum-calculator ws)]
+    (fn [w]
+      (let [nums (to-ints w)
+            [s1 s2] (check nums)]
+        {:original w
+         :nums nums
+         :status (checksum-status s1 s2)
+         :checksums [s1 s2]}))))
+
+(defn word-corrector
+  "Returns a function that accepts a word and returns a map containing details
+  of any correction applied."
+  [ws]
+  (let [classify (word-classifier ws)
+        locate (l/error-locator ws)]
+    (fn [w]
+      (let [m (classify w)]
+        (condp = (:status m)
+          :correct       (merge m {:correct (:original m)})
+          :uncorrectable m
+          :correctable   m)))))
 
 (defn corrector
   "Returns a validator/corrector function for the given weight scheme.  The
@@ -72,26 +94,10 @@
     :correct     - the corrected word (absent if status is :uncorrectable)
     :error-type  - :transcription or :transposition if :status is :corrected
     :error-pos   - position of the error in the word if :status is :corrected"
-  [{:keys [p n alphabet method] :as ws}]
-  (let [checksums (checksum-calculator ws)
-        locate-error (l/error-locator ws)
-        classify-error (error-classifier ws)
-        to-ints (t/str->ints alphabet)
-        to-str (t/ints->str alphabet)]
+  [{:keys [n alphabet] :as ws}]
+  (let [correct (word-corrector ws)]
     (fn [w]
       {:pre [(every? (set alphabet) w) (= n (count w))]}
       (-> w
-        to-ints
-        checksums
-        (update :original to-str)
-        (update-if-exists :corrected to-str)))))
-
-    ; (fn [word]
-    ;   (let [[s1 s2] (calc word)
-    ;         status (classify-checksums s1 s2)
-    ;         res {:original word :status status}]
-    ;     (condp = status
-    ;       :correct       (merge res {:correct word})
-    ;       :uncorrectable (merge res {:error-type :unknown})
-    ;       :correctable   (merge res (-> (det word)
-    ;                                   (partial correct-error p))))))))
+        correct
+        (select-keys [:original :status :correct :error-type :error-pos])))))

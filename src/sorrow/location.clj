@@ -13,7 +13,7 @@
   (let [inv (n/inverses-mod-p p)]
     (fn [s1 s2]
       (let [ep1 (dec (mod (- (* s2 (inv s1)) b) p))
-            ep2 (dec (/ (- ep1 a) 2))
+            ep2 (dec (mod (/ (- ep1 a) 2) p))
             e (if (<= 0 ep1 (dec n))
                 (mod (* s1 (inv (mod (+ ep1 a) p))) p)
                 0)]
