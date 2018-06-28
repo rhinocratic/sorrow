@@ -31,7 +31,7 @@
            (<= 0 ep2 (- n 2))) :transposition
       :else                    :uncorrectable)))
 
-(defn error-locator
+(defn- error-locator
   "Add error location information to a validation record"
   [ws]
   (let [locate-error (l/error-locator ws)]
@@ -62,7 +62,7 @@
     (dissoc :error-pos :error-type)
     (assoc :status :uncorrectable)))
 
-(defn validator
+(defn- validator
   "Returns a function that accepts a word and returns a map containing:
     :status    - :correct, :uncorrectable or :correctable
     :original  - the original word
@@ -79,7 +79,7 @@
          :status (checksum-status s1 s2)
          :checksums [s1 s2]}))))
 
-(defn update-if-exists
+(defn- update-if-exists
   "Update a map if the key k exists"
   [m k f]
   (if (contains? m k)

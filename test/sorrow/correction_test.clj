@@ -30,6 +30,12 @@
     (is (= :transposition (ec 12 4)))
     (is (= :uncorrectable (ec 11 12)))))
 
+(deftest test-error-locator
+  (testing "Creation of error locator"
+    (let [ws {:p 37 :n 8 :a 2 :b 19 :method 2}
+          loc (#'sorrow.correction/error-locator ws)]
+      (is (= {:error-pos 5 :error-size 1} (loc 16 1))))))
+
 (deftest test-correct--error
   (let [corr #'sorrow.correction/correct-error]
     (testing "Correction of transcription errors"
