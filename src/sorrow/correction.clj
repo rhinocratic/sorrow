@@ -31,6 +31,14 @@
            (<= 0 ep2 (- n 2))) :transposition
       :else                    :uncorrectable)))
 
+(defn error-locator
+  "Add error location information to a validation record"
+  [ws]
+  (let [locate-error (l/error-locator ws)]
+    (fn [{:keys [checksums] :as m}]
+      (let [[ep1 ep2 e] (apply locate-error checksums)]
+        (assoc m :error-pos [ep1 ep2] :error-size e)))))
+
 (defmulti correct-error
   "Correct a single transcription error or transposition of adjacent characters."
   :error-type)
@@ -38,7 +46,7 @@
 (defmethod correct-error :transcription
   [{:keys [nums error-pos error-size] :as m}]
   (let [cor (update nums error-pos #(- % error-size))]
-    (assoc m :corrected cor)))
+    (assoc m :corrected cor :status :corrected)))
 
 (defmethod correct-error :transposition
   [{:keys [nums error-pos] :as m}]
@@ -46,7 +54,7 @@
               (take error-pos nums)
               [(nums (inc error-pos)) (nums error-pos)]
               (drop (+ 2 error-pos) nums))]
-    (assoc m :corrected cor)))
+    (assoc m :corrected cor :status :corrected)))
 
 (defmethod correct-error :uncorrectable
   [m]
@@ -54,12 +62,11 @@
     (dissoc :error-pos :error-type)
     (assoc :status :uncorrectable)))
 
-
-(defn word-classifier
+(defn validator
   "Returns a function that accepts a word and returns a map containing:
+    :status    - :correct, :uncorrectable or :correctable
     :original  - the original word
     :nums      - the original word as a vector of ints
-    :status    - :correct, :uncorrectable or :correctable
     :checksums - a vector containing the 2 checksums"
   [{:keys [alphabet] :as ws}]
   (let [to-ints (t/str->ints alphabet)
@@ -72,18 +79,12 @@
          :status (checksum-status s1 s2)
          :checksums [s1 s2]}))))
 
-(defn word-corrector
-  "Returns a function that accepts a word and returns a map containing details
-  of any correction applied."
-  [ws]
-  (let [classify (word-classifier ws)
-        locate (l/error-locator ws)]
-    (fn [w]
-      (let [m (classify w)]
-        (condp = (:status m)
-          :correct       (merge m {:correct (:original m)})
-          :uncorrectable m
-          :correctable   m)))))
+(defn update-if-exists
+  "Update a map if the key k exists"
+  [m k f]
+  (if (contains? m k)
+    (update m k f)
+    m))
 
 (defn corrector
   "Returns a validator/corrector function for the given weight scheme.  The
@@ -95,9 +96,15 @@
     :error-type  - :transcription or :transposition if :status is :corrected
     :error-pos   - position of the error in the word if :status is :corrected"
   [{:keys [n alphabet] :as ws}]
-  (let [correct (word-corrector ws)]
+  (let [validate (validator ws)
+        locate-error (error-locator ws)
+        to-str (t/ints->str alphabet)]
     (fn [w]
       {:pre [(every? (set alphabet) w) (= n (count w))]}
-      (-> w
-        correct
-        (select-keys [:original :status :correct :error-type :error-pos])))))
+      (let [v (validate w)]
+        (-> (condp = (:status v)
+              :correct       (merge v {:correct (:original v)})
+              :correctable   (-> v locate-error correct-error)
+              :uncorrectable v)
+          (select-keys [:status :original :corrected :error-type :error-pos])
+          (update-if-exists :corrected to-str))))))

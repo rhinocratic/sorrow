@@ -42,13 +42,13 @@
       (is (= {:status :uncorrectable :original "flib"}
             (corr {:error-pos 42 :error-type :uncorrectable :original "flib"}))))))
 
-(deftest test-word-classifier
+(deftest test-validator
   (testing "Classification of words according to their checksums"
     (let [ws {:p 37
               :w [4 16 27 34 25 26 30 9]
               :w' [35 4 29 16 5 27 20 34]
               :alphabet c/alphanumeric-upper-case}
-          classify (#'sorrow.correction/word-classifier ws)]
+          classify (#'sorrow.correction/validator ws)]
       (is (= {:original "4H9SC5ZC"
               :nums [4 17 9 28 12 5 35 12]
               :status :correct
