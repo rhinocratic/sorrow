@@ -1,12 +1,13 @@
 (ns sorrow.core-test
   (:require #?(:clj  [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest testing is]])
-            [sorrow.core :refer [encoder corrector alphanumeric-upper-case]]))    
+            [sorrow.core :refer [encoder corrector alphanumeric-upper-case]]))
 
 (deftest test-encoder
   (testing "Creation of encoder (method 1)"
     (let [enc (encoder alphanumeric-upper-case 8)]
-      (is (= "4H9SC510" (enc "4H9SC5"))))))
+      (is (= "4H9SC510" (enc "4H9SC5")))
+      (is (= "ABC1235K" (enc "ABC123"))))))
 
 (deftest test-corrector
   (testing "Creation of corrector (method 1)"
