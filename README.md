@@ -1,6 +1,7 @@
 # sorrow
 
 [![Build Status](https://travis-ci.org/rhinocratic/sorrow.svg?branch=master)](https://travis-ci.org/rhinocratic/sorrow)
+[![License](https://img.shields.io/badge/License-EPL%201.0-red.svg)](https://opensource.org/licenses/EPL-1.0)
 
 An error-correcting coding scheme for alphanumeric data, as described by A.S. Sethi, V. Rajaraman and P.S. Kenjale in their 1977 [paper](https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data).
 
@@ -17,10 +18,10 @@ will be used, the more complex second method being reserved for cases when longe
 
 ## Encoding
 
-For Leiningen, add the following to the ```dependencies``` section of your project.clj:
+<!-- For Leiningen, add the following to the ```dependencies``` section of your project.clj:
 ```clojure
 [sorrow "0.1.0"]
-```
+``` -->
 
 To create an encoder for an alphabet and a desired encoded word length n:
 ```clojure
