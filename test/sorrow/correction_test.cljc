@@ -1,8 +1,7 @@
 (ns sorrow.correction-test
   (:require #?(:clj  [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [is]])
-            [sorrow.correction :refer :all]
-            [sorrow.core :as c]))
+               :cljs [cljs.test :refer-macros [deftest testing is]])
+            [sorrow.correction :refer [corrector]]))
 
 (deftest test-checksum-calculator
   (testing "Calculation of checksums - weight scheme for method 1"
@@ -64,7 +63,7 @@
     (let [ws {:p 37
               :w [4 16 27 34 25 26 30 9]
               :w' [35 4 29 16 5 27 20 34]
-              :alphabet c/alphanumeric-upper-case}
+              :alphabet "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*"}
           classify (#'sorrow.correction/validator ws)]
       (is (= {:original "4H9SC5ZC"
               :nums [4 17 9 28 12 5 35 12]
@@ -93,9 +92,9 @@
                 :b 0
                 :w [12 13 14 15 16 17 18 19]
                 :w' [12 26 5 23 6 28 15 4]
-                :alphabet c/alphanumeric-upper-case
+                :alphabet "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*"
                 :method 1}
-            correct (#'sorrow.correction/corrector ws)]
+            correct (corrector ws)]
         (is (= {:original "4H9ZC510"
                 :status :corrected
                 :correct "4H9SC510"
@@ -109,9 +108,9 @@
               :b 19
               :w [4 16 27 34 25 26 30 9]
               :w' [35 4 29 16 5 27 20 34]
-              :alphabet c/alphanumeric-upper-case
+              :alphabet "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*"
               :method 2}
-          correct (#'sorrow.correction/corrector ws)]
+          correct (corrector ws)]
       (is (= {:original "4H9ZC5ZC"
               :status :corrected
               :correct "4H9SC5ZC"

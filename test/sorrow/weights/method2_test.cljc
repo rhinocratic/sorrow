@@ -1,8 +1,7 @@
 (ns sorrow.weights.method2-test
   (:require #?(:clj  [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [is]])
-            [sorrow.weights.method2 :refer :all]
-            [sorrow.core :refer [alphanumeric-upper-case]]))
+               :cljs [cljs.test :refer-macros [deftest testing is]])
+            [sorrow.weights.method2 :refer [weight-scheme]]))
 
 (deftest test-diff-coprime?
   (testing "Predicate to determine if x is coprime to b - a"
@@ -59,15 +58,15 @@
             :b 19
             :w [4 16 27 34 25 26 30 9 36 33 21 10 3 12 11 7 28 1]
             :w' [35 4 29 16 5 27 20 34 6 25 24 26 22 30 14 9 19 36]
-            :alphabet alphanumeric-upper-case
+            :alphabet "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*"
             :method 2}
-          (weight-scheme alphanumeric-upper-case 18)))
+          (weight-scheme "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*" 18)))
     (is (= {:p 37
             :n 8
             :a 2
             :b 19
             :w [4 16 27 34 25 26 30 9]
             :w' [35 4 29 16 5 27 20 34]
-            :alphabet alphanumeric-upper-case
+            :alphabet "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*"
             :method 2}
-          (weight-scheme alphanumeric-upper-case 8)))))
+          (weight-scheme "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*" 8)))))

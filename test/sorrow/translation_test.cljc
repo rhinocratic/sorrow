@@ -1,7 +1,7 @@
 (ns sorrow.translation-test
   (:require #?(:clj  [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [is]])
-            [sorrow.translation :refer :all]))
+               :cljs [cljs.test :refer-macros [deftest testing is]])
+            [sorrow.translation :refer [str->ints ints->str]]))
 
 (deftest test-str->ints
   (testing "Conversion from strings to vectors of integers"

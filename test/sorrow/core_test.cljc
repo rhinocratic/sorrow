@@ -1,8 +1,7 @@
 (ns sorrow.core-test
   (:require #?(:clj  [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [is]])
-            [sorrow.core :refer :all]
-            [sorrow.weights.method2 :as wm2]))
+               :cljs [cljs.test :refer-macros [deftest testing is]])
+            [sorrow.core :refer [encoder corrector alphanumeric-upper-case]]))    
 
 (deftest test-encoder
   (testing "Creation of encoder (method 1)"

@@ -1,7 +1,9 @@
 (ns sorrow.numeric-test
   (:require #?(:clj  [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [is]])
-            [sorrow.numeric :refer :all]))
+               :cljs [cljs.test :refer-macros [deftest testing is]])
+            [sorrow.numeric :refer [prime? gcd lcm mod-inverse inverses-mod-p powers-of-n-mod-p
+                                    weighted-sum scalev minusv eliminate-ith-term
+                                    linear-congruence-solver simultaneous-congruence-solver]]))
 
 (def first-50-primes
   [2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101
