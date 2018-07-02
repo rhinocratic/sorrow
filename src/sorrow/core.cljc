@@ -30,7 +30,7 @@
          (int? n)
          (<= 5 n (/ (dec (count alpha)) 2))]}
   (let [p (count alpha)
-        method1-max (int (Math/floor (/ (+ p 2) 3)))]
+        method1-max (int (/ (+ p 2) 3))]
     (cond
       (<= n method1-max) (wm1/weight-scheme alpha n)
       :else              (wm2/weight-scheme alpha n))))
@@ -56,7 +56,7 @@
   The corrector returns a map containing the following entries:
     :status      - :correct, :corrected or :uncorrectable
     :original    - the uncorrected word, as supplied to the corrector
-    :corrected   - the corrected word (absent if :status = :uncorrectable,
+    :correct     - the corrected word (absent if :status = :uncorrectable,
                    same as :original if :status = :correct)
     :error-type  - :transcription or :transposition if :status = :corrected
     :error-pos   - position of the error in the word if :status = :corrected"

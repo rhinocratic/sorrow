@@ -1,5 +1,6 @@
 (ns sorrow.numeric-test
-  (:require [clojure.test :refer :all]
+  (:require #?(:clj  [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [is]])
             [sorrow.numeric :refer :all]))
 
 (def first-50-primes

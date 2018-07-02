@@ -1,5 +1,6 @@
 (ns sorrow.correction-test
-  (:require [clojure.test :refer :all]
+  (:require #?(:clj  [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [is]])
             [sorrow.correction :refer :all]
             [sorrow.core :as c]))
 
@@ -49,11 +50,11 @@
 (deftest test-correct
   (let [corr #'sorrow.correction/correct]
     (testing "Correction of transcription errors"
-      (is (= [1 2 3 4] (:corrected (corr {:nums [1 2 35 4] :error-pos 2 :error-size 32 :error-type :transcription :p 37})))))
+      (is (= [1 2 3 4] (:correct (corr {:nums [1 2 35 4] :error-pos 2 :error-size 32 :error-type :transcription :p 37})))))
     (testing "Correction of transposition errors"
-      (is (= [1 2 3 4] (:corrected (corr {:nums [2 1 3 4] :error-pos 0 :error-type :transposition :p 37}))))
-      (is (= [1 2 3 4] (:corrected (corr {:nums [1 3 2 4] :error-pos 1 :error-type :transposition :p 37}))))
-      (is (= [1 2 3 4] (:corrected (corr {:nums [1 2 4 3] :error-pos 2 :error-type :transposition :p 37})))))
+      (is (= [1 2 3 4] (:correct (corr {:nums [2 1 3 4] :error-pos 0 :error-type :transposition :p 37}))))
+      (is (= [1 2 3 4] (:correct (corr {:nums [1 3 2 4] :error-pos 1 :error-type :transposition :p 37}))))
+      (is (= [1 2 3 4] (:correct (corr {:nums [1 2 4 3] :error-pos 2 :error-type :transposition :p 37})))))
     (testing "Handling of uncorrectable errors"
       (is (= {:status :uncorrectable :original "flib"}
             (corr {:error-pos 42 :error-type :uncorrectable :original "flib"}))))))
@@ -97,7 +98,7 @@
             correct (#'sorrow.correction/corrector ws)]
         (is (= {:original "4H9ZC510"
                 :status :corrected
-                :corrected "4H9SC510"
+                :correct "4H9SC510"
                 :error-pos 3
                 :error-type :transcription}
               (correct "4H9ZC510")))))
@@ -113,7 +114,7 @@
           correct (#'sorrow.correction/corrector ws)]
       (is (= {:original "4H9ZC5ZC"
               :status :corrected
-              :corrected "4H9SC5ZC"
+              :correct "4H9SC5ZC"
               :error-pos 3
               :error-type :transcription}
             (correct "4H9ZC5ZC"))))))

@@ -1,6 +1,8 @@
 # sorrow
 
-Error-correcting codes for character data.
+An error-correcting coding scheme for alphanumeric data, as described by A.S. Sethi, V. Rajaraman and P.S. Kenjale in their 1977 [paper](https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data).
+
+
 
 ## Usage
 
@@ -11,6 +13,6 @@ For Leiningen, add the following to the ```dependencies``` section of your proje
 
 ## License
 
-Copyright © 2018
+Copyright © 2018 Andrew Baxter
 
 Distributed under the Eclipse Public License version 1.0.

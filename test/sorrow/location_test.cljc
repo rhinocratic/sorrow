@@ -1,5 +1,6 @@
 (ns sorrow.location-test
-  (:require [clojure.test :refer :all]
+  (:require #?(:clj  [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [is]])
             [sorrow.location :refer :all]))
 
 (deftest test-error-locator

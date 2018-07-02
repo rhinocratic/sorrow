@@ -10,7 +10,7 @@
   in encoding and correction."
   [alpha n]
   (let [p (count alpha)
-        N (int (Math/floor (/ (+ p 2) 3)))
+        N (int (/ (+ p 2) 3))
         a (- N 2)
         r (range 1 (inc n))
         w (map (partial + a) r)

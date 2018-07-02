@@ -32,7 +32,8 @@
       :else                    :uncorrectable)))
 
 (defn- error-locator
-  "Add error location and type information to a validation record"
+  "Returns a function that adds error location and type information to a
+  validation record"
   [ws]
   (let [locate-error (l/error-locator ws)
         classify-error (error-classifier ws)]
@@ -52,7 +53,7 @@
 (defmethod correct :transcription
   [{:keys [p nums error-pos error-size] :as m}]
   (let [cor (update nums error-pos #(mod (- % error-size) p))]
-    (assoc m :corrected cor :status :corrected)))
+    (assoc m :correct cor :status :corrected)))
 
 (defmethod correct :transposition
   [{:keys [nums error-pos] :as m}]
@@ -60,7 +61,7 @@
               (take error-pos nums)
               [(nums (inc error-pos)) (nums error-pos)]
               (drop (+ 2 error-pos) nums))]
-    (assoc m :corrected cor :status :corrected)))
+    (assoc m :correct cor :status :corrected)))
 
 (defmethod correct :uncorrectable
   [m]
@@ -98,11 +99,11 @@
   "Returns a validator/corrector function for the given weight scheme.  The
   function accepts a vector of integers representing a word, and returns a map
   containing the following:
-    :original    - the uncorrected word, as supplied to the corrector
+    :original    - the uncorrected word
     :status      - :correct, :corrected or :uncorrectable
-    :correct     - the corrected word (absent if status is :uncorrectable)
-    :error-type  - :transcription or :transposition if :status is :corrected
-    :error-pos   - position of the error in the word if :status is :corrected"
+    :correct     - the corrected word (absent if status = :uncorrectable)
+    :error-type  - :transcription or :transposition if :status = :corrected
+    :error-pos   - position of the error in the word if :status = :corrected"
   [{:keys [n alphabet] :as ws}]
   (let [validate (validator ws)
         locate (error-locator ws)
@@ -114,5 +115,5 @@
               :correct       (merge m {:correct (:original m)})
               :correctable   (-> m locate correct)
               :uncorrectable m)
-          (select-keys [:status :original :corrected :error-type :error-pos])
-          (update-if-exists :corrected to-str))))))
+          (select-keys [:status :original :correct :error-type :error-pos])
+          (update-if-exists :correct to-str))))))

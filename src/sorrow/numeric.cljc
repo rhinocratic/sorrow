@@ -10,7 +10,9 @@
 (defn prime?
   "Predicate that returns true if n is prime, false otherwise."
   [n]
-  (let [chk (take-while #(<= % (Math/sqrt n)) possible-primes)]
+  {:pre [pos-int? n]}
+  (let [sqrt #?(:clj #(Math/sqrt %) :cljs #(js/Math.sqrt %))
+        chk (take-while #(<= % (sqrt n)) possible-primes)]
     (and
       (not= 1 n)
       (every? #(not= 0 (mod n %)) chk))))
@@ -20,6 +22,7 @@
    x, y such that xm + yn = gcd(m, n), using the extended Euclidean algorithm.
    Returns a vector [x y gcd(m, n)]"
   [m n]
+  {:pre [(not= 0 m) (not= 0 n)]}
   (loop [x [0 1]
          y [1 0]
          r [n m]]
@@ -33,6 +36,7 @@
 (defn lcm
   "Calculate the least common multiple of m and n"
   [m n]
+  {:pre [(not= 0 m) (not= 0 n)]}
   (/ (* m n) (last (gcd m n))))
 
 (defn mod-inverse

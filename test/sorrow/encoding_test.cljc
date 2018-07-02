@@ -1,5 +1,6 @@
 (ns sorrow.encoding-test
-  (:require [clojure.test :refer :all]
+  (:require #?(:clj  [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [is]])
             [sorrow.encoding :refer :all]
             [sorrow.core :refer [alphanumeric-upper-case]]
             [sorrow.weights.method1 :as wm1]

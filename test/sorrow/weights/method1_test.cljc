@@ -1,5 +1,6 @@
 (ns sorrow.weights.method1-test
-  (:require [clojure.test :refer :all]
+  (:require #?(:clj  [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [is]])
             [sorrow.weights.method1 :refer :all]
             [sorrow.core :refer [alphanumeric-upper-case]]))
 

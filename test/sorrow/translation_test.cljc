@@ -1,5 +1,6 @@
 (ns sorrow.translation-test
-  (:require [clojure.test :refer :all]
+  (:require #?(:clj  [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [is]])
             [sorrow.translation :refer :all]))
 
 (deftest test-str->ints
