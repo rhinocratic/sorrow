@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/rhinocratic/sorrow.svg?branch=master)](https://travis-ci.org/rhinocratic/sorrow)
 [![License](https://img.shields.io/badge/License-EPL%201.0-red.svg)](https://opensource.org/licenses/EPL-1.0)
 
-An error-correcting coding scheme for alphanumeric data, as described by A.S. Sethi, V. Rajaraman and P.S. Kenjale in their 1977 [paper](https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data).
+A Clojure/ClojureScript implementation of an error-correcting coding scheme for alphanumeric data, as described by A.S. Sethi, V. Rajaraman and P.S. Kenjale in their 1977 [paper](https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data).
 
 The encoding appends two check characters to an alphanumeric string in order to enable the detection
 and correction of the following types of error:
