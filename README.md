@@ -1,6 +1,6 @@
 # sorrow
 
-[![Build Status(https://travis-ci.org/rhinocratic/sorrow.svg?branch=master)](https://travis-ci.org/rhinocratic/sorrow)]
+[![Build Status](https://travis-ci.org/rhinocratic/sorrow.svg?branch=master)](https://travis-ci.org/rhinocratic/sorrow)
 
 An error-correcting coding scheme for alphanumeric data, as described by A.S. Sethi, V. Rajaraman and P.S. Kenjale in their 1977 [paper](https://vdocuments.site/download/an-error-correcting-coding-scheme-for-alphanumeric-data).
 
