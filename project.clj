@@ -7,11 +7,11 @@
                  [org.clojure/clojurescript "1.10.339"]]
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-doo "0.1.10"]]
-  :doo {:build "node-test"}
+  :doo {:build "test-node"}
   :cljsbuild
-            {:builds [{:id "node-test"
-                       :source-paths ["src" "test"]
-                       :compiler {:output-to "target/testable.js"
-                                  :output-dir "target"
-                                  :main sorrow.runner
-                                  :target :nodejs}}]})
+       {:builds [{:id "test-node"
+                  :source-paths ["src" "test"]
+                  :compiler {:output-to "target/testable.js"
+                             :output-dir "target"
+                             :main sorrow.runner
+                             :target :nodejs}}]})

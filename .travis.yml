@@ -1,2 +1,2 @@
 language: clojure
-script: "lein test && lein doo node test-node once "
+script: "lein test && lein doo node once "
