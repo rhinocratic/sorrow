@@ -12,7 +12,7 @@ and correction of the following types of error:
 - a single transposition of adjacent characters
 
 For an alphabet of (prime) size p, the maximum length of an encoded word will be (p - 1)/2.  The
-check characters are calculated according by two different methods according to the desired length
+check characters are calculated by one of two different methods according to the desired length
 n of the encoded word.  For n <= ⌊(p + 2)/3⌋, the simpler of the two methods described in the paper
 will be used, the more complex second method being reserved for cases when longer words are required.
 
@@ -31,7 +31,7 @@ To create an encoder for an alphabet and a desired encoded word length n:
 ```
 
 The cardinality of the alphabet must be prime.  The returned encoding function will accept words of length n-2 formed from the alphabet and
-append the check characters:
+append the two check characters:
 ```clojure
 (enc "ABC123")
 
@@ -56,7 +56,7 @@ To obtain a corrector for encoded words of length n:
 (def cor (corrector alphanumeric-upper-case 8))
 ```
 
-The returned function will return a map containing the following:
+For an encoded string of length n, the corrector function will return a map containing the following:
 
 - ```:status```      - ```:correct```, ```:corrected``` or ```:uncorrectable```
 - ```:original```    - the uncorrected word, as supplied to the corrector
