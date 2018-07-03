@@ -57,10 +57,9 @@
 
 (defmethod correct :transposition
   [{:keys [nums error-pos] :as m}]
-  (let [cor (concat
-              (take error-pos nums)
-              [(nums (inc error-pos)) (nums error-pos)]
-              (drop (+ 2 error-pos) nums))]
+  (let [cor (-> nums
+              (assoc error-pos (nums (inc error-pos)))
+              (assoc (inc error-pos) (nums error-pos)))]
     (assoc m :correct cor :status :corrected)))
 
 (defmethod correct :uncorrectable
