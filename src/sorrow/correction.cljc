@@ -90,7 +90,9 @@
 (defn- update-if-exists
   "Update a map if the key k exists"
   [m k f]
-  (if (contains? m k)
+  (if (and
+        (contains? m k)
+        (not (string? (m k))))
     (update m k f)
     m))
 

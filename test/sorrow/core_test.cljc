@@ -12,6 +12,7 @@
 (deftest test-corrector
   (testing "Creation of corrector (method 1)"
     (let [cor (corrector alphanumeric-upper-case 8)]
+      (is (= "4H9SC510" (:correct (cor "4H9SC510"))))
       (is (= "4H9SC510" (:correct (cor "4H9ZC510"))))
       (is (= "4H9SC510" (:correct (cor "5H9SC510"))))
       (is (= "4H9SC510" (:correct (cor "4H9SC512"))))
@@ -20,6 +21,7 @@
       (is (= "4H9SC510" (:correct (cor "4H9SC501"))))))
   (testing "Creation of corrector (method 2)"
     (let [cor (corrector alphanumeric-upper-case 15)]
+      (is (= "4H9SC610DQ7R3FC" (:correct (cor "4H9SC610DQ7R3FC"))))
       (is (= "4H9SC610DQ7R3FC" (:correct (cor "4H9SC630DQ7R3FC"))))
       (is (= "4H9SC610DQ7R3FC" (:correct (cor "2H9SC610DQ7R3FC"))))
       (is (= "4H9SC610DQ7R3FC" (:correct (cor "4H9SC610DQ7R3FG"))))
