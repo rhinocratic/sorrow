@@ -25,7 +25,7 @@ will be used, the more complex second method being reserved for cases when longe
 
 To create an encoder for an alphabet and a desired encoded word length n:
 ```clojure
-(require '[sorrow.core :refer [encoder decoder alphanumeric-upper-case]])
+(require '[sorrow.core :refer [encoder corrector alphanumeric-upper-case]])
 
 (def enc (encoder alphanumeric-upper-case 8))
 ```
