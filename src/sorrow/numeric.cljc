@@ -1,4 +1,5 @@
-(ns sorrow.numeric)
+(ns sorrow.numeric
+  "Namespace containing numerical utilities")
 
 (def ^{:private true} possible-primes
   "A list of integers starting with 2, 3 and followed by all integers of the form 6k±1.

@@ -1,4 +1,5 @@
 (ns sorrow.encoding
+  "Namespace containing the encoder implementation"
   (:require [sorrow.translation :as t]
             [sorrow.numeric :as n]))
 

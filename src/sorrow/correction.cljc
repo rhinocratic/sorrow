@@ -1,4 +1,5 @@
 (ns sorrow.correction
+  "Namespace containing functionality for auto-correcting encoded strings"
    (:require [sorrow.numeric :as n]
              [sorrow.translation :as t]
              [sorrow.location :as l]))

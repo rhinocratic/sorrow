@@ -1,4 +1,5 @@
-(ns sorrow.translation)
+(ns sorrow.translation
+  "Namespace containing functionality for translating strings to/from sequences of integers")
 
 (defn str->ints
   "Returns a function that converts words formed from characters of the alphabet

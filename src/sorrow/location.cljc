@@ -1,4 +1,5 @@
 (ns sorrow.location
+  "Namespace containing functionality for locating errors in encoded strings"
   (:require [clojure.set :as s]
             [sorrow.numeric :as n]))
 
