@@ -72,9 +72,13 @@ For example:
 ;; => {:status :corrected, :original "4H9SC512", :correct "4H9SC510", :error-type :transcription, :error-pos 7}
 ```
 
+## Running the project's tests
+```
+$ clojure -T:build test
+```
 
 ## License
 
-Copyright © 2018 Andrew Baxter
+Copyright © 2023 Andrew Baxter
 
 Distributed under the Eclipse Public License version 1.0.
